@@ -29,7 +29,7 @@ class Logger(threading.Thread):
         self.filePath: Optional[str] = None
         self.messageTemplate: str = '(%level) %timer > %content'
         self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'
-        self.filter: NonNegativeInt | list[str] = []
+        self.filter: NonNegativeInt | set[str] = {}
         self.levels: dict[str, Level] = {
             'DEBUG': Level(10, '34', None, None),
             'INFO': Level(20, '32', None, None),
@@ -80,7 +80,7 @@ def default(level: str, message: str, colorfulMessage: Optional[str] = None, log
         raise KeyError('no level with this key')
 
     ''' Filter '''
-    if isinstance(logger.filter, list):
+    if isinstance(logger.filter, set):
         for _level in logger.filter:
             if level == _level:
                 return

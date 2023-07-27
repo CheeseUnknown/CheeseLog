@@ -22,11 +22,11 @@
 
     日期模版使用日期的匹配词。
 
-- **`self.filter: NonNegativeInt | list[str] = []`**
+- **`self.filter: NonNegativeInt | set[str] = []`**
 
     过滤消息。
 
-    当该值为`list`时，会对其中符合等级的消息进行过滤。
+    当该值为`set`时，会对其中符合等级的消息进行过滤。
 
     当该值为`NonNegativeInt`时，会过滤等级权重小于该值的消息。
 
