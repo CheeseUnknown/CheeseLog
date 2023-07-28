@@ -4,7 +4,7 @@
 
 如果你需要输出自定义等级的消息，请使用`default(...)`手动设置标签。
 
-- **`def default(level: str, message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = None)`**
+- **`def default(level: str, message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger)`**
 
     - **colorfulMessage**
 

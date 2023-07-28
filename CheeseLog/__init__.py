@@ -1,4 +1,4 @@
-import os, sys, threading, queue, datetime, re
+import os, sys, threading, queue, datetime
 from typing import Optional
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -29,7 +29,7 @@ class Logger(threading.Thread):
         self.filePath: Optional[str] = None
         self.messageTemplate: str = '(%level) %timer > %content'
         self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'
-        self.filter: NonNegativeInt | set[str] = {}
+        self.filter: NonNegativeInt | set[str] = set()
         self.levels: dict[str, Level] = {
             'DEBUG': Level(10, '34', None, None),
             'INFO': Level(20, '32', None, None),
@@ -66,15 +66,7 @@ class Logger(threading.Thread):
 
 logger = Logger()
 
-def default(level: str, message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = None):
-    '''
-    ### Args
-
-    - colorfulMessage: 不满足于自动的色彩填充，可以选择自定义的控制台内容。它仅会改变消息内容，对消息等级以及时间的样式不会有影响。
-
-    - logger: 应该不会用到...指定其他的日志实例输出消息。
-    '''
-
+def default(level: str, message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger):
     ''' Validate '''
     if level not in logger.levels:
         raise KeyError('no level with this key')
