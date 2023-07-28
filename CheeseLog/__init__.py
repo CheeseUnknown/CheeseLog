@@ -8,7 +8,7 @@ from CheeseType import NonNegativeInt
 class Level:
     def __init__(self, weight: NonNegativeInt, color: Optional[str] = None, messageTemplate: Optional[str] = None, timerTemplate: Optional[str] = None):
         '''
-        ## Args
+        ### Args
 
         - weight：权重。小于日志过滤权重的消息会被忽略。
 
@@ -68,7 +68,7 @@ logger = Logger()
 
 def default(level: str, message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = None):
     '''
-    ## Args
+    ### Args
 
     - colorfulMessage: 不满足于自动的色彩填充，可以选择自定义的控制台内容。它仅会改变消息内容，对消息等级以及时间的样式不会有影响。
 
