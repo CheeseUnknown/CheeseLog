@@ -8,15 +8,15 @@
 
 ```python
 {
-    'DEBUG': Level(10, '34', None, None),
-    'INFO': Level(20, '32', None, None),
-    'STARTING': Level(20, '32', None, None),
-    'ENDING': Level(20, '34', None, None),
-    'HTTP': Level(20, None, None, None),
-    'WEBSOCKET': Level(20, None, None, None),
-    'WARNING': Level(30, '33', None, None),
-    'DANGER': Level(40, '31', None, None),
-    'ERROR': Level(50, '35', None, None)
+    'DEBUG': Level(10, '34', None),
+    'INFO': Level(20, '32', None),
+    'STARTING': Level(20, '32', None),
+    'ENDING': Level(20, '34', None),
+    'HTTP': Level(20, None, None),
+    'WEBSOCKET': Level(20, None, None),
+    'WARNING': Level(30, '33', None),
+    'DANGER': Level(40, '31', None),
+    'ERROR': Level(50, '35', None)
 }
 ```
 
@@ -24,7 +24,7 @@
 
 你可以通过该类创造自定义的等级。
 
-- **`def __init__(self, weight: NonNegativeInt, color: Optional[str] = None, messageTemplate: Optional[str] = None, timerTemplate: Optional[str] = None)`**
+- **`def __init__(self, weight: NonNegativeInt, color: Optional[str] = None, messageTemplate: Optional[str] = None)`**
 
     - **weight**
 
@@ -38,6 +38,3 @@
 
         消息格式，默认为`logger.messageTemplate`。
 
-    - **timerTemplate**
-
-        日期格式，默认为`logger.timerTemplate`。

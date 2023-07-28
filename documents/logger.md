@@ -10,17 +10,12 @@
 
 - **`self.messageTemplate: str = '(%level) %timer > %content'`**
 
-    消息模版有几个匹配词：
+    消息模版使用日期的匹配词，并有几个自定义的匹配词：
 
     | 匹配词 | 匹配内容 |
     | - | - |
     | %level | 消息等级 |
-    | %timer | 日期模版 |
     | %content | 消息内容 |
-
-- **`self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'`**
-
-    日期模版使用日期的匹配词。
 
 - **`self.filter: NonNegativeInt | set[str] = []`**
 
