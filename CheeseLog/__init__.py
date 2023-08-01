@@ -1,8 +1,7 @@
 import os, sys, threading, queue, datetime
-from typing import Optional
-from io import TextIOWrapper
+from typing import Optional, Set
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from CheeseType import NonNegativeInt
 
@@ -26,7 +25,7 @@ class Logger(threading.Thread):
     def __init__(self):
         self.filePath: Optional[str] = None
         self.messageTemplate: str = '(%level) %Y-%m-%d %H:%M:%S.%f > %content'
-        self.filter: NonNegativeInt | set[str] = set()
+        self.filter: NonNegativeInt | Set[str] = set()
         self.levels: dict[str, Level] = {
             'DEBUG': Level(10, '34', None),
             'INFO': Level(20, '32', None),
@@ -48,11 +47,11 @@ class Logger(threading.Thread):
         self._flag = True
         while self._flag or not self._queue.empty():
             level, now, message = self._queue.get()
-            message = ''.join([ now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%level', level).replace('%content', message).replace('\n', '\n    ')), '\n' ])
+            message = now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%level', level).replace('%content', message).replace('\n', '\n    ')) + '\n'
             if self.filePath is not None:
                 os.makedirs(os.path.dirname(self.filePath), exist_ok = True)
-            with open(self.filePath, 'a', encoding = 'utf-8') as f:
-                f.write(message)
+                with open(self.filePath, 'a', encoding = 'utf-8') as f:
+                    f.write(message)
 
     def stop(self):
         self._flag = False
