@@ -5,7 +5,7 @@ with open('./README.md', 'r', encoding = 'utf-8') as f:
 
 setuptools.setup(
     name = 'CheeseLog',
-    version = '0.0.3',
+    version = '0.0.4',
     author = 'Cheese Unknown',
     author_email = 'cheese@cheese.ren',
     description = '日志系统。可在控制台输出一定格式的、可选颜色的内容，并支持写入指定的日志文件。',

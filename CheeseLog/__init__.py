@@ -1,8 +1,6 @@
 import os, sys, threading, queue, datetime
 from typing import Optional, Set
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-
 from CheeseType import NonNegativeInt
 
 class Level:
@@ -30,9 +28,11 @@ class Logger(threading.Thread):
             'DEBUG': Level(10, '34', None),
             'INFO': Level(20, '32', None),
             'STARTING': Level(20, '32', None),
+            'LOADING': Level(20, '34', '(%level) %content'),
+            'LOADED': Level(20, '35', None),
             'ENDING': Level(20, '34', None),
-            'HTTP': Level(20, None, None),
-            'WEBSOCKET': Level(20, None, None),
+            'HTTP': Level(20, '34', None),
+            'WEBSOCKET': Level(20, '34', None),
             'WARNING': Level(30, '33', None),
             'DANGER': Level(40, '31', None),
             'ERROR': Level(50, '35', None)
@@ -114,3 +114,12 @@ def http(message: str, colorfulMessage: Optional[str] = None, logger: Optional[L
 
 def websocket(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger):
     default('WEBSOCKET', message, colorfulMessage, logger)
+
+def loaded(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger):
+    default('LOADED', message, colorfulMessage, logger)
+
+def loading(message: str, logger: Optional[Logger] = logger, end: str | None = '\n'):
+    if sys.stdout.isatty():
+        message = f'{message}'
+        terminalMessage = (logger.levels['LOADING'].messageTemplate or logger.messageTemplate).replace('%level', f'\033[{logger.levels["LOADING"].color}mLOADING\033[0m').replace('%content', message).replace('\n', '\n    ')
+        print(terminalMessage, end = end)

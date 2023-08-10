@@ -35,3 +35,7 @@
 - **`def http(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger)`**
 
 - **`def websocket(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger)`**
+
+- **`def loaded(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger)`**
+
+- **`def loading(message: str, logger: Optional[Logger] = logger, end: str | None = '\n')`**

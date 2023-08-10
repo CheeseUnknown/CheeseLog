@@ -2,18 +2,20 @@
 
 ## **预设等级**
 
-本系统默认提供9种消息等级，分别为`'DEBUG'`,`'INFO'`,`'STARTING'`,`'ENDING'`,`'HTTP'`,`'WEBSOCKET'`,`'WARNING'`,`'DANGER'`,`'ERROR'`。
+本系统默认提供11种消息等级，各等级的权重也分为5档，这只是粗略的分别，有需要的话可以自定义更详细的权重分类。
 
-各等级的权重也分为5档，这只是粗略的分别，有需要的话可以自定义更详细的权重分类。
+其中，`'LOADING'`是特殊的，它永远不会被写入日志，并无法使用当前时间。
 
 ```python
 {
     'DEBUG': Level(10, '34', None),
     'INFO': Level(20, '32', None),
     'STARTING': Level(20, '32', None),
+    'LOADING': Level(20, '34', '(%level) %content'),
+    'LOADED': Level(20, '35', None),
     'ENDING': Level(20, '34', None),
-    'HTTP': Level(20, None, None),
-    'WEBSOCKET': Level(20, None, None),
+    'HTTP': Level(20, '34', None),
+    'WEBSOCKET': Level(20, '34', None),
     'WARNING': Level(30, '33', None),
     'DANGER': Level(40, '31', None),
     'ERROR': Level(50, '35', None)
@@ -37,4 +39,3 @@
     - **messageTemplate**
 
         消息格式，默认为`logger.messageTemplate`。
-
