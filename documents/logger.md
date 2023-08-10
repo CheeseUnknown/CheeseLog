@@ -16,6 +16,9 @@
     | - | - |
     | %level | 消息等级 |
     | %content | 消息内容 |
+    | %timer | 日期模版 |
+
+- **`self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'`**
 
 - **`self.filter: NonNegativeInt | set[str] = []`**
 

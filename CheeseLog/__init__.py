@@ -4,7 +4,7 @@ from typing import Optional, Set
 from CheeseType import NonNegativeInt
 
 class Level:
-    def __init__(self, weight: NonNegativeInt, color: Optional[str] = None, messageTemplate: Optional[str] = None):
+    def __init__(self, weight: NonNegativeInt, color: Optional[str] = None, messageTemplate: Optional[str] = None, timerTemplate: Optional[str] = None):
         '''
         ### Args
 
@@ -13,29 +13,33 @@ class Level:
         - color：控制台打印的等级标签样式。
 
         - messageTemplate：消息格式，默认为`logger.messageTemplate`。
+
+        - timerTemplate: 日期格式，默认为`logger.timerTemplate`。
         '''
 
         self.weight: NonNegativeInt = weight
         self.color: Optional[str] = color
         self.messageTemplate: Optional[str] = messageTemplate
+        self.timerTemplate: Optional[str] = timerTemplate
 
 class Logger(threading.Thread):
     def __init__(self):
         self.filePath: Optional[str] = None
-        self.messageTemplate: str = '(%level) %Y-%m-%d %H:%M:%S.%f > %content'
+        self.messageTemplate: str = '(%level) %timer > %content'
+        self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'
         self.filter: NonNegativeInt | Set[str] = set()
         self.levels: dict[str, Level] = {
-            'DEBUG': Level(10, '34', None),
-            'INFO': Level(20, '32', None),
-            'STARTING': Level(20, '32', None),
-            'LOADING': Level(20, '34', '(%level) %content'),
-            'LOADED': Level(20, '35', None),
-            'ENDING': Level(20, '34', None),
-            'HTTP': Level(20, '34', None),
-            'WEBSOCKET': Level(20, '34', None),
-            'WARNING': Level(30, '33', None),
-            'DANGER': Level(40, '31', None),
-            'ERROR': Level(50, '35', None)
+            'DEBUG': Level(10, '34', None, None),
+            'INFO': Level(20, '32', None, None),
+            'STARTING': Level(20, '32', None, None),
+            'LOADING': Level(20, '34', '(%level) %content', None),
+            'LOADED': Level(20, '35', None, None),
+            'ENDING': Level(20, '34', None, None),
+            'HTTP': Level(20, '34', None, None),
+            'WEBSOCKET': Level(20, '34', None, None),
+            'WARNING': Level(30, '33', None, None),
+            'DANGER': Level(40, '31', None, None),
+            'ERROR': Level(50, '35', None, None)
         }
         self.colorful: bool = True
         self._queue: queue.Queue = queue.Queue()
@@ -77,9 +81,9 @@ def default(level: str, message: str, colorfulMessage: Optional[str] = None, log
     message = f'{message}'
     if sys.stdout.isatty():
         if logger.colorful:
-            terminalMessage = now.strftime((logger.levels[level].messageTemplate or logger.messageTemplate).replace('%level', f'\033[{logger.levels[level].color}m{level}\033[0m' if logger.levels[level].color else level).replace('%content', colorfulMessage or message).replace('\n', '\n    '))
+            terminalMessage = now.strftime((logger.levels[level].messageTemplate or logger.messageTemplate).replace('%level', f'\033[{logger.levels[level].color}m{level}\033[0m' if logger.levels[level].color else level).replace('%timer', '\033[2m' + (logger.levels[level].timerTemplate or logger.timerTemplate) + '\033[0m').replace('%content', colorfulMessage or message).replace('\n', '\n    '))
         else:
-            terminalMessage = now.strftime((logger.levels[level].messageTemplate or logger.messageTemplate).replace('%level', level).replace('%content', message).replace('\n', '\n    '))
+            terminalMessage = now.strftime((logger.levels[level].messageTemplate or logger.messageTemplate).replace('%level', level).replace('%timer', logger.levels[level].timerTemplate or logger.timerTemplate).replace('%content', message).replace('\n', '\n    '))
         print(terminalMessage)
 
     ''' Log file writter '''
@@ -118,8 +122,8 @@ def websocket(message: str, colorfulMessage: Optional[str] = None, logger: Optio
 def loaded(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger):
     default('LOADED', message, colorfulMessage, logger)
 
-def loading(message: str, logger: Optional[Logger] = logger, end: str | None = '\n'):
+def loading(message: str, logger: Optional[Logger] = logger):
     if sys.stdout.isatty():
         message = f'{message}'
         terminalMessage = (logger.levels['LOADING'].messageTemplate or logger.messageTemplate).replace('%level', f'\033[{logger.levels["LOADING"].color}mLOADING\033[0m').replace('%content', message).replace('\n', '\n    ')
-        print(terminalMessage, end = end)
+        print('\x1b[K' + terminalMessage, end = '\r')

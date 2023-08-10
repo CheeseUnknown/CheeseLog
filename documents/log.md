@@ -38,4 +38,4 @@
 
 - **`def loaded(message: str, colorfulMessage: Optional[str] = None, logger: Optional[Logger] = logger)`**
 
-- **`def loading(message: str, logger: Optional[Logger] = logger, end: str | None = '\n')`**
+- **`def loading(message: str, logger: Optional[Logger] = logger)`**
