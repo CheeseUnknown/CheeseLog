@@ -2,113 +2,94 @@
 
 ## **介绍**
 
-一个简单的日志系统。
+一款完全动态的日志系统，它有以下特点：
 
-## **功能**
+1. 多种的消息等级，可自定义添加新的等级。在打印与日志写入可以使用权重、指定消息或指定模块内的消息进行过滤，实现个性化的消息输出。
 
-1. 支持动态的自定义消息格式。
+2. 支持控制台样式打印，有完善的样式体系可以直接使用，自定义的消息模版可以实现个性化的消息输出，在未有打印环境的情况下停止打印节省资源。
 
-2. 支持控制台消息色彩输出。
+3. 支持日志文件记录，支持动态修改输出文件，可自由开启关闭。该方法不会阻塞进程，对你的程序影响微乎其微。
 
-3. 支持动态的消息等级设置。
-
-4. 支持动态的日志文件输出。
-
-5. 支持动态的消息过滤。
+4. 可以输出自定义格式的进度条，这对于一些下载或加载的控制台显示非常有帮助。
 
 ## **安装**
+
+目前仅支持python3.11，这里也推荐将python升级到3.11。
 
 ```bash
 pip install CheeseLog
 ```
 
-## **使用**
+## **示例**
 
-### **控制台打印**
+### **基本用法**
+
+打印各种类型的Hello World，更多的内置方法请查看[Logger](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)。
 
 ```python
-from CheeseLog import debug, info, warning, danger, error
+from CheeseLog import logger
 
-debug('Hello World!') # (DEBUG) 2023-07-26 15:47:09.250318 > Hello World!
-info('Hello World!') # (INFO) 2023-07-26 15:47:09.250589 > Hello World!
-warning('Hello World!') # (WARNING) 2023-07-26 15:47:09.250600 > Hello World!
-danger('Hello World!') # (DANGER) 2023-07-26 15:47:09.250611 > Hello World!
-error('Hello World!') # (ERROR) 2023-07-26 15:47:09.250618 > Hello World!
+logger.debug('Hello World')
+logger.info('Hello World')
+logger.warning('Hello World')
+logger.danger('Hello World')
+logger.error('Hello World')
+
+logger.destory()
 ```
 
-### **自定义色彩**
+### **样式打印**
 
-自定义色彩后，消息的内容不再自动修改颜色。
+更多样式请查看[Style](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Style.md)。
 
 ```python
-from CheeseLog import debug
+from CheeseLog import logger
 
-debug('Hello World!', '\033[32mHello World\033[0m') # (DEBUG) 2023-07-26 15:47:09.250318 > Hello World!
+# 如果没有日志文件输出，可以在message直接使用样式
+logger.debug('<green>Hello World</green>')
+
+# 因为message会被记录到日志文件中
+logger.debug('Hello World', '<green>Hello World</green>')
+
+logger.destory()
 ```
 
-### **自定义消息格式**
+### **日志输出**
 
 ```python
-from CheeseLog import logger, debug
+from CheeseLog import logger
 
-logger.messageTemplate = '[%level] > %timer > %content'
-logger.timerTemplate = '%Y-%m-%d %H-%M-%S-%f'
+logger.filePath = './myLog.log'
+logger.debug('Hello World')
+# 中途修改输出日志是可以的
+logger.filePath = './yourLog.log'
+logger.debug('Hello World')
 
-debug('Hello World!') # [DEBUG] > 2023-07-26 15-47-09-250318 > Hello World!
+logger.destory()
 ```
 
-### **写入日志文件**
+### **消息过滤**
 
-日志文件的创建是惰性的，只有第一次写入操作进行的时候才会尝试创建文件。
+更多消息过滤信息请看[Logger](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)。
 
-```python
-from CheeseLog import logger, debug
-
-logger.filepath = './myLog.log'
-
-debug('Hello World!') # 写入 ./muLog.log
-
-logger.filepath = './yourLog.log'
-
-debug('Hello World!') # 写入 ./yourLog.log
-
-logger.stop() # 当程序结束时，可能还有部分内容仍在缓冲区未写入文件，请使用该函数以等待写入完毕
-```
-
-### **自定义消息等级**
+更多消息等级信息请看[Level](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Level.md)。
 
 ```python
-from CheeseLog import logger, Level, default
+from CheeseLog import logger
 
-print(logger.levels) # 查看已有的等级
-
-logger.levels['MY_LEVEL'] = Level(weight = 20, color = '33') # 设置一个名为MY_LEVEL的等级。
-
-default('MY_LEVEL', 'Hello World!') # (MY_LEVEL) 2023-07-26 17:03:41.982807 > Hello World!
-```
-
-### **过滤消息**
-
-```python
-from CheeseLog import logger, debug, info, warning
-
-# 指定消息的过滤等级
-logger.filter = [ 'DEBUG', 'INFO' ]
-debug('Hello World!')
-info('Hello World!')
-warning('Hello World!') # (WARNING) 2023-07-26 15:47:09.250600 > Hello World!
-
-# 使用权重过滤消息
-logger.filter = 15
-debug('Hello World!')
-info('Hello World!') # (INFO) 2023-07-26 15:47:09.250589 > Hello World!
-warning('Hello World!') # (WARNING) 2023-07-26 15:47:09.250600 > Hello World!
+logger.filePath = './myLog.log'
+logger.weightFilter = 20 # 权重过滤，优先级最高
+logger.levelFilter.add('DANGER') # 指定消息等级过滤，优先级其次
+logger.moduleFilter['Xxx'] = 100 # 指定模块过滤，优先级最后
+...
 ```
 
 ## **更多...**
 
-### 1. **[消息等级](https://github.com/CheeseUnknown/CheeseLog/tree/master/documents/level.md)**
+### 1. [**Style**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Style.md)
 
-### 2. **[日志实例](https://github.com/CheeseUnknown/CheeseLog/tree/master/documents/logger.md)**
+### 2. [**Level**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Level.md)
 
-### 3. **[日志记录](https://github.com/CheeseUnknown/CheeseLog/tree/master/documents/log.md)**
+### 3. [**Logger**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)
+
+### 4. [**Progress Bar**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/ProgressBar.md)
