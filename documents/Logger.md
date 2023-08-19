@@ -68,15 +68,15 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 ## **`self.logger_weightFilter: int = 0`**
 
-同`self.weightFilter`，在之后进行过滤。
+同`self.weightFilter`，在其之后进行日志过滤。
 
 ## **`self.logger_levelFilter: Set[str] = set([ 'LOADING' ])`**
 
-同`self.levelFilter`，在之后进行过滤。
+同`self.levelFilter`，在其之后进行日志过滤。
 
 ## **`self.logger_moduleFilter: Dict[str, int | Set[str]] = {}`**
 
-同`self.moduleFilter`，在之后进行过滤。
+同`self.moduleFilter`，在其之后进行日志过滤。
 
 ## **`self.styled: bool = True`**
 
