@@ -10,7 +10,7 @@ def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None])
     while not event.is_set() or not queue.empty():
         data = queue.get()
         message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])) + '\n'
-        os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
+        os.makedirs(os.path.dirname(filePath.value), exist_ok = True).replace('\n', '\n    ')
         with open(filePath.value, 'a', encoding = 'utf-8') as f:
             f.write(message)
 
@@ -87,9 +87,9 @@ class Logger:
         message = str(message)
         if sys.stdout and sys.stdout.isatty():
             if self.styled:
-                _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', now.strftime((self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%l', level).replace('%c', styledMessage or message).replace('%t', self.timerTemplate))))
+                _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', now.strftime((self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%l', level).replace('%c', styledMessage or message).replace('%t', self.timerTemplate)))).replace('\n', '\n    ')
             else:
-                _message = now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%l', level).replace('%c', message).replace('%t', self.timerTemplate))
+                _message = now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%l', level).replace('%c', message).replace('%t', self.timerTemplate)).replace('\n', '\n    ')
             if refreshed:
                 _message = '\033[F\033[K' + _message
             print(_message, end = end)
