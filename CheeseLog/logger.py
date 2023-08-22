@@ -9,8 +9,8 @@ from CheeseLog.level import Level
 def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None]):
     while not event.is_set() or not queue.empty():
         data = queue.get()
-        message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])) + '\n'
-        os.makedirs(os.path.dirname(filePath.value), exist_ok = True).replace('\n', '\n    ')
+        message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ') + '\n'
+        os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
         with open(filePath.value, 'a', encoding = 'utf-8') as f:
             f.write(message)
 
