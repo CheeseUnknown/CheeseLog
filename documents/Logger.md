@@ -89,3 +89,55 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ## **`def destory(self)`**
 
 当程序关闭时，有时会出现部分内容被遗漏的情况，请使用`destory()`等待数据处理完毕。
+
+## **`def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+默认的输出函数。如果使用的是自定义消息等级，请使用该函数手动输入等级。
+
+- **refresh**
+
+    为`True`时会将当前行覆盖，且不会被记录到日志文件中。
+
+## **`def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为DEBUG的输出函数。
+
+## **`def info(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为INFO的输出函数。
+
+## **`def starting(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为STARTING的输出函数。
+
+## **`def ending(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为ENDING的输出函数。
+
+## **`def warning(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为WARNING的输出函数。
+
+## **`def danger(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为DANGER的输出函数。
+
+## **`def websocket(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为WEBSOCKET的输出函数。
+
+## **`def http(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为HTTP的输出函数。
+
+## **`def loaded(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为LOADED的输出函数。
+
+## **`def loading(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为LOADING的输出函数。
+
+## **`def encode(self, message: str) -> str`**
+
+当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。

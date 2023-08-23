@@ -10,7 +10,7 @@ def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None])
     while not event.is_set() or not queue.empty():
         data = queue.get()
         message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ') + '\n'
-        os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
+        os.makedirs(os.path.dirname(filePath.value), exist_ok = True).replace('&lt;', '<').replace('&gt;', '>')
         with open(filePath.value, 'a', encoding = 'utf-8') as f:
             f.write(message)
 
@@ -92,7 +92,7 @@ class Logger:
                 _message = now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%l', level).replace('%c', message).replace('%t', self.timerTemplate)).replace('\n', '\n    ')
             if refreshed:
                 _message = '\033[F\033[K' + _message
-            print(_message, end = end)
+            print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
 
         if self.filePath:
             if self.levels[level].weight < self.logger_weightFilter:
@@ -152,6 +152,9 @@ class Logger:
 
     def loading(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True):
         self.default('LOADING', message, styledMessage, end = end, refreshed = refreshed)
+
+    def encode(self, message: str) -> str:
+        return message.replace('<', '&lt;').replace('>', '&gt;')
 
     @property
     def filePath(self) -> str:

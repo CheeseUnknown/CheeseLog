@@ -51,6 +51,9 @@ logger.debug('<green>Hello World</green>')
 # 因为message会被记录到日志文件中
 logger.debug('Hello World', '<green>Hello World</green>')
 
+# 如果内容有'<'和'>'的组合，请对部分内容进行加密
+logger.debug(logger.encode('<p>Hello World</p>'))
+
 logger.destory()
 ```
 
