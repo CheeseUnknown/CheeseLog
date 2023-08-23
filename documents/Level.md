@@ -38,6 +38,6 @@ from CheeseLog import Level
     'WEBSOCKET': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
     'WARNING': Level(30, styledMessageTemplate = '(<yellow>%l</yellow>) <black>%t</black> > %c'),
     'DANGER': Level(40, styledMessageTemplate = '(<red>%l</red>) <black>%t</black> > %c'),
-    'ERROR': Level(50, styledMessageTemplate = '(<manenta>%l</manenta>) <black>%t</black> > %c')
+    'ERROR': Level(50, styledMessageTemplate = '(<magenta>%l</magenta>) <black>%t</black> > %c')
 }
 ```
