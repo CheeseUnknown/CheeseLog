@@ -96,7 +96,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 - **refresh**
 
-    为`True`时会将当前行覆盖，且不会被记录到日志文件中。
+    为`True`时会将当前行覆盖。
 
 ## **`def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 
