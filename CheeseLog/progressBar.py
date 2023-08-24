@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from CheeseType import NonNegativeFloat, PositiveInt
 
 class ProgressBar:
@@ -8,9 +10,8 @@ class ProgressBar:
         self.leftStr: str = leftStr
         self.rightStr: str = rightStr
 
-    def __call__(self, value: NonNegativeFloat):
+    def __call__(self, value: NonNegativeFloat) -> Tuple[str, str]:
         left = round(value * self.length)
         right = self.length - left
-        s = self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '{:.2f}%'.format(value * 100))
 
-        return s
+        return self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '{:.2f}%'.format(value * 100)), self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '<blue>{:.2f}%</blue>'.format(value * 100))

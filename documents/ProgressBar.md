@@ -9,7 +9,8 @@ from CheeseLog import logger, ProgressBar
 
 progressBar = ProgressBar(20)
 for i in range(101):
-    logger.loading(processBar(i / 100))
+    message, styledMessage = processBar(i / 100)
+    logger.loading(message, styledMessage)
     time.sleep(0.1)
 logger.destory()
 ```
@@ -45,7 +46,7 @@ logger.destory()
 
     未完成的进度字符。
 
-### **`def __call__(self, value: NonNegativeFloat)`**
+### **`def __call__(self, value: NonNegativeFloat) -> Tuple[str, str]`**
 
 - **value**
 

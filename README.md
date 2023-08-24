@@ -96,3 +96,7 @@ logger.moduleFilter['Xxx'] = 100 # 指定模块过滤，优先级最后
 ### 3. [**Logger**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)
 
 ### 4. [**Progress Bar**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/ProgressBar.md)
+
+## **使用CheeseLog的项目**
+
+### [**CheeseAPI 一款协程友好的web框架**](https://github.com/CheeseUnknown/CheeseAPI)
