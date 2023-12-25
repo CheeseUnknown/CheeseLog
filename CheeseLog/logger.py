@@ -8,17 +8,20 @@ from CheeseLog import style
 from CheeseLog.level import Level
 
 def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None]):
-    while not event.is_set() or not queue.empty():
-        try:
-            data = queue.get(timeout = 0.1)
-            message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
-            os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
-            with open(filePath.value, 'a', encoding = 'utf-8') as f:
-                f.write(message)
-        except KeyboardInterrupt:
-            ...
-        except Empty:
-            ...
+    try:
+        while not event.is_set() or not queue.empty():
+            try:
+                data = queue.get(timeout = 0.1)
+                message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
+                os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
+                with open(filePath.value, 'a', encoding = 'utf-8') as f:
+                    f.write(message)
+            except Empty:
+                ...
+    except KeyboardInterrupt:
+        ...
+    except BrokenPipeError:
+        ...
 
 class Logger:
     def __init__(self):
@@ -171,7 +174,7 @@ class Logger:
         if value:
             self._filePath.value = value
             if not self._process:
-                self._process = Process(target = _processHandle, name = 'CheeseLog', args = (self._queue, self._event, self._filePath))
+                self._process = Process(target = _processHandle, name = 'CheeseLog', args = (self._queue, self._event, self._filePath), daemon = True)
                 self._process.start()
         else:
             self.destory()
