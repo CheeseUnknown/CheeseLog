@@ -18,8 +18,8 @@ def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None])
                     f.write(message)
             except Empty:
                 ...
-    except KeyboardInterrupt:
-        ...
+            except KeyboardInterrupt:
+                ...
     except BrokenPipeError:
         ...
 
@@ -174,7 +174,7 @@ class Logger:
         if value:
             self._filePath.value = value
             if not self._process:
-                self._process = Process(target = _processHandle, name = 'CheeseLog', args = (self._queue, self._event, self._filePath), daemon = True)
+                self._process = Process(target = _processHandle, name = 'CheeseLog', args = (self._queue, self._event, self._filePath))
                 self._process.start()
         else:
             self.destory()
