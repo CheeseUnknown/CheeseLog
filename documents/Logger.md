@@ -94,7 +94,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 默认的输出函数。如果使用的是自定义消息等级，请使用该函数手动输入等级。
 
-- **refresh**
+- **refreshed**
 
     为`True`时会将当前行覆盖。
 

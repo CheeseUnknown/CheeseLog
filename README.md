@@ -8,13 +8,13 @@
 
 2. 支持控制台样式打印，有完善的样式体系可以直接使用，自定义的消息模版可以实现个性化的消息输出，在未有打印环境的情况下停止打印节省资源。
 
-3. 支持日志文件记录，支持动态修改输出文件，可自由开启关闭。该方法不会阻塞进程，对你的程序影响微乎其微。
+3. 支持日志文件记录，支持动态修改输出文件，可自由开启关闭。
 
 4. 可以输出自定义格式的进度条，这对于一些下载或加载的控制台显示非常有帮助。
 
 ## **安装**
 
-目前仅支持linux python3.11，这里也推荐将python升级到3.11。
+目前仅保证支持3.11及更高版本的python。
 
 ```bash
 pip install CheeseLog
@@ -96,7 +96,3 @@ logger.moduleFilter['Xxx'] = 100 # 指定模块过滤，优先级最后
 ### 3. [**Logger**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)
 
 ### 4. [**Progress Bar**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/ProgressBar.md)
-
-## **使用CheeseLog的项目**
-
-### [**CheeseAPI 一款协程友好的web框架**](https://github.com/CheeseUnknown/CheeseAPI)

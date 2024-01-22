@@ -1,27 +1,8 @@
-import inspect, datetime, sys, re, os
+import inspect, datetime, sys, re, os, threading, queue
 from typing import Dict, Set
-from multiprocessing import Process, Queue, Event, Manager
-from multiprocessing.managers import ValueProxy
-from queue import Empty
 
 from CheeseLog import style
 from CheeseLog.level import Level
-
-def _processHandle(queue: Queue, event: Event, filePath: ValueProxy[str | None]):
-    try:
-        while not event.is_set() or not queue.empty():
-            try:
-                data = queue.get(timeout = 0.1)
-                message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
-                os.makedirs(os.path.dirname(filePath.value), exist_ok = True)
-                with open(filePath.value, 'a', encoding = 'utf-8') as f:
-                    f.write(message)
-            except Empty:
-                ...
-            except KeyboardInterrupt:
-                ...
-    except BrokenPipeError:
-        ...
 
 class Logger:
     def __init__(self):
@@ -51,17 +32,32 @@ class Logger:
 
         self.styled: bool = True
 
-        manager = Manager()
-        self._filePath: ValueProxy[str | None] = manager.Value(str | None, None)
-        self._process: Process | None = None
-        self._queue: Queue = Queue()
-        self._event: Event = Event()
+        self._filePath: str | None = None
+        self._processor: threading.Thread | None = None
+        self._queue: queue.Queue = queue.Queue()
+        self._event: threading.Event = threading.Event()
+
+    def _processHandle(self):
+        try:
+            while not self._event.is_set() or not self._queue.empty():
+                try:
+                    data = self._queue.get(timeout = 0.1)
+                    message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
+                    os.makedirs(os.path.dirname(self._filePath), exist_ok = True)
+                    with open(self._filePath, 'a', encoding = 'utf-8') as f:
+                        f.write(message)
+                except queue.Empty:
+                    ...
+                except KeyboardInterrupt:
+                    ...
+        except BrokenPipeError:
+            ...
 
     def destory(self):
-        if self._process:
+        if self._processor:
             self._event.set()
-            self._process.join()
-            self._process = None
+            self._processor.join()
+            self._processor = None
             self._event.clear()
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
@@ -167,17 +163,17 @@ class Logger:
 
     @property
     def filePath(self) -> str:
-        return self._filePath.value
+        return self._filePath
 
     @filePath.setter
-    def filePath(self, value):
+    def filePath(self, value: str | None):
         if value:
-            self._filePath.value = value
-            if not self._process:
-                self._process = Process(target = _processHandle, name = 'CheeseLog', args = (self._queue, self._event, self._filePath))
-                self._process.start()
+            self._filePath = value
+            if not self._processor:
+                self._processor = threading.Thread(target = self._processHandle, name = 'CheeseLog')
+                self._processor.start()
         else:
             self.destory()
-            self._filePath.value = value
+            self._filePath = value
 
 logger = Logger()
