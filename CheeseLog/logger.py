@@ -91,7 +91,7 @@ class Logger:
                     break
 
         for pattern in self.contentFilter:
-            if re.match(pattern, message):
+            if re.search(pattern, message):
                 return
 
         now = datetime.datetime.now()
@@ -130,7 +130,7 @@ class Logger:
                         break
 
             for pattern in self.logger_contentFilter:
-                if re.match(pattern, message):
+                if re.search(pattern, message):
                     return
 
             self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
