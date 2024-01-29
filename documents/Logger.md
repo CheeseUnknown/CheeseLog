@@ -54,7 +54,7 @@ logger.destory()
 
 ## **`self.moduleFilter: Dict[str, int | Set[str]] = {}`**
 
-指定模块的消息等级过滤，优先级最次。
+指定模块的消息等级过滤，优先级再次。
 
 ```python
 from CheeseLog import logger
@@ -65,6 +65,10 @@ logger.moduleFilter['Xxx'] = 20
 # 指定模块的指定消息等级过滤
 logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ```
+
+## **`self.contentFilter: Set[re.Match] = set()`**
+
+对匹配的内容进行过滤，优先级最低。
 
 ## **`self.logger_weightFilter: int = 0`**
 
@@ -77,6 +81,10 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ## **`self.logger_moduleFilter: Dict[str, int | Set[str]] = {}`**
 
 同`self.moduleFilter`，在其之后进行日志过滤。
+
+## **`self.logger_contentFilter: Set[re.Match] = set()`**
+
+同`self.contentFilter`，在其之后进行日志过滤。
 
 ## **`self.styled: bool = True`**
 

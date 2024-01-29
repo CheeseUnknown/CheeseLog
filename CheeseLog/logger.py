@@ -26,9 +26,11 @@ class Logger:
         self.weightFilter: int = 0
         self.levelFilter: Set[str] = set()
         self.moduleFilter: Dict[str, int | Set[str]] = {}
+        self.contentFilter: Set[re.Match] = set()
         self.logger_weightFilter: int = 0
         self.logger_levelFilter: Set[str] = set([ 'LOADING' ])
         self.logger_moduleFilter: Dict[str, int | Set[str]] = {}
+        self.logger_contentFilter: Set[re.Match] = set()
 
         self.styled: bool = True
 
@@ -88,6 +90,10 @@ class Logger:
                 if flag:
                     break
 
+        for pattern in self.contentFilter:
+            if re.match(pattern, message):
+                return
+
         now = datetime.datetime.now()
         message = str(message)
         if sys.stdout and sys.stdout.isatty():
@@ -122,6 +128,10 @@ class Logger:
                             break
                     if flag:
                         break
+
+            for pattern in self.logger_contentFilter:
+                if re.match(pattern, message):
+                    return
 
             self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
 
