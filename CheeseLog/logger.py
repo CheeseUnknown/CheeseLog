@@ -55,7 +55,7 @@ class Logger:
         except BrokenPipeError:
             ...
 
-    def destory(self):
+    def destroy(self):
         if self._processor:
             self._event.set()
             self._processor.join()
