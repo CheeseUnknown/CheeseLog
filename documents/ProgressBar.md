@@ -9,7 +9,7 @@ from CheeseLog import logger, ProgressBar
 
 progressBar = ProgressBar(20)
 for i in range(101):
-    message, styledMessage = processBar(i / 100)
+    message, styledMessage = progressBar(i / 100)
     logger.loading(message, styledMessage)
     time.sleep(0.1)
 logger.destory()
