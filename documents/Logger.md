@@ -96,7 +96,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 ## **`def destroy(self)`**
 
-当程序关闭时，有时会出现部分内容被遗漏的情况，请使用`destroy()`等待数据处理完毕。
+在程序结束后若有未记录的日志信息，则会等待记录完毕。
 
 ## **`def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 
