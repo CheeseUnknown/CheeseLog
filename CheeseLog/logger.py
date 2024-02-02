@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, multiprocessing, queue, setproctitle
+import inspect, datetime, sys, re, os, multiprocessing, queue
 from typing import Dict, Set
 
 from CheeseLog import style
@@ -40,6 +40,8 @@ class Logger:
         self._event: multiprocessing.Event = multiprocessing.Event()
 
     def _processHandle(self):
+        import setproctitle
+
         parentProcessor = multiprocessing.parent_process()
         setproctitle.setproctitle((parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
 
