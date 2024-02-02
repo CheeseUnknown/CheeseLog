@@ -34,7 +34,7 @@ class Logger:
 
         self.styled: bool = True
 
-        self.filePath: str | None = None
+        self._filePath: multiprocessing.Array = multiprocessing.Array('c', 1024)
         self._processHandler: multiprocessing.Process | None = None
         self._queue: multiprocessing.Queue = multiprocessing.Queue()
         self._event: multiprocessing.Event = multiprocessing.Event()
@@ -48,8 +48,10 @@ class Logger:
                 try:
                     data = self._queue.get(timeout = 0.01)
                     message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
-                    os.makedirs(os.path.dirname(self.filePath), exist_ok = True)
-                    with open(self.filePath, 'a', encoding = 'utf-8') as f:
+
+                    filePath = self._filePath.value.decode()
+                    os.makedirs(os.path.dirname(filePath), exist_ok = True)
+                    with open(filePath, 'a', encoding = 'utf-8') as f:
                         f.write(message)
                 except queue.Empty:
                     ...
@@ -108,7 +110,7 @@ class Logger:
                 _message = '\033[F\033[K' + _message
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
 
-        if self.filePath:
+        if self._filePath.value:
             if self.levels[level].weight < self.logger_weightFilter:
                 return
 
@@ -138,11 +140,11 @@ class Logger:
 
             self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
 
-            if self.filePath and not self._processHandler:
+            if self._filePath.value and not self._processHandler:
                 parentProcessor = multiprocessing.parent_process()
                 self._processHandler = multiprocessing.Process(target = self._processHandle, name = (parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
                 self._processHandler.start()
-            elif not self.filePath and self._processHandler:
+            elif not self._filePath.value and self._processHandler:
                 self.destroy()
 
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
@@ -180,5 +182,13 @@ class Logger:
 
     def encode(self, message: str) -> str:
         return message.replace('<', '&lt;').replace('>', '&gt;')
+
+    @property
+    def filePath(self) -> str | None:
+        return self._filePath.value.decode() if self._filePath.value else None
+
+    @filePath.setter
+    def filePath(self, value: str | None):
+        self._filePath.value = value.encode() if value else b''
 
 logger = Logger()
