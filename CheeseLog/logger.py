@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, threading, queue
+import inspect, datetime, sys, re, os, multiprocessing, queue, setproctitle
 from typing import Dict, Set
 
 from CheeseLog import style
@@ -34,19 +34,22 @@ class Logger:
 
         self.styled: bool = True
 
-        self._filePath: str | None = None
-        self._processor: threading.Thread | None = None
-        self._queue: queue.Queue = queue.Queue()
-        self._event: threading.Event = threading.Event()
+        self.filePath: str | None = None
+        self._processHandler: multiprocessing.Process | None = None
+        self._queue: multiprocessing.Queue = multiprocessing.Queue()
+        self._event: multiprocessing.Event = multiprocessing.Event()
 
     def _processHandle(self):
+        parentProcessor = multiprocessing.parent_process()
+        setproctitle.setproctitle((parentProcessor.name + ':' if parentProcessor and hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
+
         try:
             while not self._event.is_set() or not self._queue.empty():
                 try:
-                    data = self._queue.get(timeout = 0.1)
+                    data = self._queue.get(timeout = 0.01)
                     message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
-                    os.makedirs(os.path.dirname(self._filePath), exist_ok = True)
-                    with open(self._filePath, 'a', encoding = 'utf-8') as f:
+                    os.makedirs(os.path.dirname(self.filePath), exist_ok = True)
+                    with open(self.filePath, 'a', encoding = 'utf-8') as f:
                         f.write(message)
                 except queue.Empty:
                     ...
@@ -56,10 +59,10 @@ class Logger:
             ...
 
     def destroy(self):
-        if self._processor:
+        if self._processHandler:
             self._event.set()
-            self._processor.join()
-            self._processor = None
+            self._processHandler.join()
+            self._processHandler = None
             self._event.clear()
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
@@ -135,6 +138,21 @@ class Logger:
 
             self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
 
+            if self.filePath and not self._processHandler:
+                currentProcessor = multiprocessing.current_process()
+                parentProcessor = multiprocessing.parent_process()
+
+                if parentProcessor and hasattr(parentProcessor, 'logger'):
+                    currentProcessor.logger = parentProcessor.logger
+                elif not hasattr(currentProcessor, 'logger'):
+                    currentProcessor.logger = self.filePath
+                self.filePath = currentProcessor.logger
+
+                self._processHandler = multiprocessing.Process(target = self._processHandle, name = (parentProcessor.name + ':' if parentProcessor and hasattr(parentProcessor, 'name') else '') + 'CheeseLog', daemon = parentProcessor.daemon if parentProcessor else False)
+                self._processHandler.start()
+            elif not self.filePath and self._processHandler:
+                self.destroy()
+
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
 
@@ -170,20 +188,5 @@ class Logger:
 
     def encode(self, message: str) -> str:
         return message.replace('<', '&lt;').replace('>', '&gt;')
-
-    @property
-    def filePath(self) -> str:
-        return self._filePath
-
-    @filePath.setter
-    def filePath(self, value: str | None):
-        if value:
-            self._filePath = value
-            if not self._processor:
-                self._processor = threading.Thread(target = self._processHandle, name = 'CheeseLog')
-                self._processor.start()
-        else:
-            self.destory()
-            self._filePath = value
 
 logger = Logger()

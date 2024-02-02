@@ -41,7 +41,7 @@ from CheeseLog import logger, Level
 
 logger.levels['MY_LEVEL'] = Level(40, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c')
 logger.default('MY_LEVEL', 'Hello World')
-logger.destory()
+logger.destroy()
 ```
 
 ## **`self.weightFilter: int = 0`**
@@ -94,9 +94,9 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 该值不为`None`时，尝试将消息输出到日志文件中。
 
-## **`def destory(self)`**
+## **`def destroy(self)`**
 
-当程序关闭时，有时会出现部分内容被遗漏的情况，请使用`destory()`等待数据处理完毕。
+当程序关闭时，有时会出现部分内容被遗漏的情况，请使用`destroy()`等待数据处理完毕。
 
 ## **`def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 

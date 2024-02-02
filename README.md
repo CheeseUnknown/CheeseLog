@@ -35,7 +35,7 @@ logger.warning('Hello World')
 logger.danger('Hello World')
 logger.error('Hello World')
 
-logger.destory()
+logger.destroy()
 ```
 
 ### **样式打印**
@@ -54,7 +54,7 @@ logger.debug('Hello World', '<green>Hello World</green>')
 # 如果内容有'<'和'>'的组合，请对部分内容进行加密
 logger.debug(logger.encode('<p>Hello World</p>'))
 
-logger.destory()
+logger.destroy()
 ```
 
 ### **日志输出**
@@ -68,7 +68,7 @@ logger.debug('Hello World')
 logger.filePath = './yourLog.log'
 logger.debug('Hello World')
 
-logger.destory()
+logger.destroy()
 ```
 
 ### **消息过滤**
