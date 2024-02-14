@@ -1,7 +1,7 @@
-__pycache__
 .DS_Store
-.vscode
-build
-dist
-*.egg-info
-test
+
+__pycache__
+
+/.vscode
+/.conda
+/dist
