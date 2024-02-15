@@ -142,13 +142,6 @@ class Logger:
 
             self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
 
-            if self._filePath.value and not self._processHandler:
-                parentProcessor = multiprocessing.parent_process()
-                self._processHandler = multiprocessing.Process(target = self._processHandle, name = (parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
-                self._processHandler.start()
-            elif not self._filePath.value and self._processHandler:
-                self.destroy()
-
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
 
@@ -192,5 +185,12 @@ class Logger:
     @filePath.setter
     def filePath(self, value: str | None):
         self._filePath.value = value.encode() if value else b''
+
+        if self._filePath.value and not self._processHandler:
+            parentProcessor = multiprocessing.parent_process()
+            self._processHandler = multiprocessing.Process(target = self._processHandle, name = (parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
+            self._processHandler.start()
+        elif not self._filePath.value and self._processHandler:
+            self.destroy()
 
 logger = Logger()
