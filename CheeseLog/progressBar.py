@@ -3,8 +3,8 @@ from typing import Tuple
 from CheeseType import NonNegativeFloat, PositiveInt
 
 class ProgressBar:
-    def __init__(self, length: PositiveInt, template: str = '%b%l%r%b %p%', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-'):
-        self.length: PositiveInt = PositiveInt(length)
+    def __init__(self, length: PositiveInt = 20, template: str = '%b%l%r%b %p%', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-'):
+        self.length: PositiveInt = length
         self.template: str = template
         self.boundaryStr: str = boundaryStr
         self.leftStr: str = leftStr

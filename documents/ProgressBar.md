@@ -7,7 +7,7 @@ import time
 
 from CheeseLog import logger, ProgressBar
 
-progressBar = ProgressBar(20)
+progressBar = ProgressBar()
 for i in range(101):
     message, styledMessage = progressBar(i / 100)
     logger.loading(message, styledMessage)
@@ -17,7 +17,7 @@ logger.destroy()
 
 ## **`class ProgressBar`**
 
-### **`def __init__(self, length: PositiveInt, template: str = '%b%l%r%b %p', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-')`**
+### **`def __init__(self, length: PositiveInt = 20, template: str = '%b%l%r%b %p', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-')`**
 
 - **length**
 
