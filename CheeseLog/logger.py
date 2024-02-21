@@ -41,9 +41,7 @@ class Logger:
 
     def _processHandle(self):
         import setproctitle
-
-        parentProcessor = multiprocessing.parent_process()
-        setproctitle.setproctitle((parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
+        setproctitle.setproctitle(setproctitle.getproctitle() + ':CheeseLog')
 
         try:
             while not self._event.is_set() or not self._queue.empty():
@@ -187,8 +185,8 @@ class Logger:
         self._filePath.value = value.encode() if value else b''
 
         if self._filePath.value and not self._processHandler:
-            parentProcessor = multiprocessing.parent_process()
-            self._processHandler = multiprocessing.Process(target = self._processHandle, name = (parentProcessor.name + ':' if hasattr(parentProcessor, 'name') else '') + 'CheeseLog')
+            import setproctitle
+            self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
             self._processHandler.start()
         elif not self._filePath.value and self._processHandler:
             self.destroy()
