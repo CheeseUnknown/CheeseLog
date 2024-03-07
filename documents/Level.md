@@ -32,7 +32,7 @@ from CheeseLog import Level
     'INFO': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
     'STARTING': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
     'ENDING': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
-    'LOADING': Level(20, messageTemplate = '(%l) %c', styledMessageTemplate = '(<blue>%l</blue>) %c'),
+    'LOADING': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
     'LOADED': Level(20, styledMessageTemplate = '(<cyan>%l</cyan>) <black>%t</black> > %c'),
     'HTTP': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
     'WEBSOCKET': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),

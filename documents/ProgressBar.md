@@ -17,7 +17,7 @@ logger.destroy()
 
 ## **`class ProgressBar`**
 
-### **`def __init__(self, length: PositiveInt = 20, template: str = '%b%l%r%b %p', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-')`**
+### **`def __init__(self, length: int = 20, template: str = '%b%l%r%b %p', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-')`**
 
 - **length**
 
