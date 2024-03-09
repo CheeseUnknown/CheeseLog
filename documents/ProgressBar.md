@@ -12,7 +12,6 @@ for i in range(101):
     message, styledMessage = progressBar(i / 100)
     logger.loading(message, styledMessage)
     time.sleep(0.1)
-logger.destroy()
 ```
 
 ## **`class ProgressBar`**

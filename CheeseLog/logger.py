@@ -1,6 +1,8 @@
 import inspect, datetime, sys, re, os, multiprocessing, queue
 from typing import Dict, Set
 
+import setproctitle, psutil
+
 from CheeseLog import style
 from CheeseLog.level import Level
 
@@ -35,37 +37,30 @@ class Logger:
         self.styled: bool = True
 
         self._filePath: multiprocessing.Array = multiprocessing.Array('c', 1024)
+
         self._processHandler: multiprocessing.Process | None = None
         self._queue: multiprocessing.Queue = multiprocessing.Queue()
-        self._event: multiprocessing.Event = multiprocessing.Event()
 
     def _processHandle(self):
-        import setproctitle
         setproctitle.setproctitle(setproctitle.getproctitle() + ':CheeseLog')
 
-        try:
-            while not self._event.is_set() or not self._queue.empty():
-                try:
-                    data = self._queue.get(timeout = 0.01)
-                    message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
+        flag = True
+        parentProcess = psutil.Process(os.getppid())
 
-                    filePath = self._filePath.value.decode()
-                    os.makedirs(os.path.dirname(filePath), exist_ok = True)
-                    with open(filePath, 'a', encoding = 'utf-8') as f:
-                        f.write(message)
-                except queue.Empty:
-                    ...
-                except KeyboardInterrupt:
-                    ...
-        except BrokenPipeError:
-            ...
+        while flag or not self._queue.empty():
+            try:
+                data = self._queue.get(timeout = 0.016)
+                message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
-    def destroy(self):
-        if self._processHandler:
-            self._event.set()
-            self._processHandler.join()
-            self._processHandler = None
-            self._event.clear()
+                filePath = self._filePath.value.decode()
+                os.makedirs(os.path.dirname(filePath), exist_ok = True)
+                with open(filePath, 'a', encoding = 'utf-8') as f:
+                    f.write(message)
+            except queue.Empty:
+                if not parentProcess.is_running():
+                    flag = False
+            except KeyboardInterrupt:
+                flag = False
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         if level not in self.levels:
@@ -185,10 +180,11 @@ class Logger:
         self._filePath.value = value.encode() if value else b''
 
         if self._filePath.value and not self._processHandler:
-            import setproctitle
             self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
             self._processHandler.start()
         elif not self._filePath.value and self._processHandler:
-            self.destroy()
+            self._processHandler.terminate()
+            self._processHandler.join()
+            self._processHandler = None
 
 logger = Logger()

@@ -41,7 +41,6 @@ from CheeseLog import logger, Level
 
 logger.levels['MY_LEVEL'] = Level(40, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c')
 logger.default('MY_LEVEL', 'Hello World')
-logger.destroy()
 ```
 
 ## **`logger.weightFilter: int = 0`**
@@ -93,10 +92,6 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ## **`logger.filePath: str | None = None`**
 
 该值不为`None`时，尝试将消息输出到日志文件中。
-
-## **`logger.destroy()`**
-
-在程序结束后若有未记录的日志信息，则会等待记录完毕。
 
 ## **`logger.default(level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 
