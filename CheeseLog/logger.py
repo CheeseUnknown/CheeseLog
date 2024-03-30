@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, multiprocessing, queue
+import inspect, datetime, sys, re, os, multiprocessing, queue, time
 from typing import Dict, Set
 
 import setproctitle, psutil
@@ -36,7 +36,8 @@ class Logger:
 
         self.styled: bool = True
 
-        self._filePath: multiprocessing.Array = multiprocessing.Array('c', 1024)
+        self._filePath: str = ''
+        self.fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)
 
         self._processHandler: multiprocessing.Process | None = None
         self._queue: multiprocessing.Queue = multiprocessing.Queue()
@@ -49,10 +50,21 @@ class Logger:
 
         while flag or not self._queue.empty():
             try:
+                if self.fileExpire.total_seconds():
+                    try:
+                        fileExpire = (datetime.datetime.now() - self.fileExpire).strftime(self.filePath)
+                        os.remove(fileExpire)
+                    except:
+                        ...
+
                 data = self._queue.get(timeout = 0.016)
                 message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
-                filePath = self._filePath.value.decode()
+                try:
+                    filePath = time.strftime(self.filePath)
+                except:
+                    filePath = self.filePath
+
                 os.makedirs(os.path.dirname(filePath), exist_ok = True)
                 with open(filePath, 'a', encoding = 'utf-8') as f:
                     f.write(message)
@@ -105,7 +117,7 @@ class Logger:
                 _message = '\033[F\033[K' + _message
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
 
-        if self._filePath.value:
+        if self.filePath:
             if self.levels[level].weight < self.logger_weightFilter:
                 return
 
@@ -172,17 +184,17 @@ class Logger:
         return message.replace('<', '&lt;').replace('>', '&gt;').replace('%', '%%')
 
     @property
-    def filePath(self) -> str | None:
-        return self._filePath.value.decode() if self._filePath.value else None
+    def filePath(self) -> str:
+        return self._filePath
 
     @filePath.setter
-    def filePath(self, value: str | None):
-        self._filePath.value = value.encode() if value else b''
+    def filePath(self, value: str):
+        self._filePath = value
 
-        if self._filePath.value and not self._processHandler:
+        if self.filePath and not self._processHandler:
             self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
             self._processHandler.start()
-        elif not self._filePath.value and self._processHandler:
+        elif not self.filePath and self._processHandler:
             self._processHandler.terminate()
             self._processHandler.join()
             self._processHandler = None

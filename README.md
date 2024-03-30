@@ -12,6 +12,8 @@
 
 4. 可以输出自定义格式的进度条，这对于一些下载或加载的控制台显示非常有帮助。
 
+目前仍处于开发阶段，各种功能并不保证以后的支持。
+
 ## **安装**
 
 系统要求：Linux。
@@ -61,6 +63,7 @@ logger.debug(logger.encode('<p>Hello World</p>'))
 from CheeseLog import logger
 
 logger.filePath = './myLog.log'
+
 logger.debug('Hello World')
 # 中途修改输出日志是可以的
 logger.filePath = './yourLog.log'

@@ -5,3 +5,5 @@ __pycache__
 /.vscode
 /.conda
 /dist
+/test.py
+/logs

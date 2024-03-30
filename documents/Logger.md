@@ -89,9 +89,19 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 控制台是否打印样式。
 
-## **`logger.filePath: str | None = None`**
+## **`logger.filePath: str = ''`**
 
-该值不为`None`时，尝试将消息输出到日志文件中。
+该值不为`''`时，尝试将消息输出到日志文件中。
+
+支持日期字符串模板，会动态的更改输出的日志文件。
+
+该参数请在最后设置，若该值不为`''`，则会创建日志输出进程。
+
+## **`logger.fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)`**
+
+日志的过期时间，超过该期限的日志将被删除，仅在日志名为日期模板时生效。
+
+请不要设置毫秒级的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
 
 ## **`logger.default(level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 
