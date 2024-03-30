@@ -1,7 +1,8 @@
-import inspect, datetime, sys, re, os, multiprocessing, queue, time
+import inspect, datetime, sys, re, os, multiprocessing, time
 from typing import Dict, Set
+from multiprocessing.synchronize import Event
 
-import setproctitle, psutil
+import setproctitle
 
 from CheeseLog import style
 from CheeseLog.level import Level
@@ -40,15 +41,13 @@ class Logger:
         self.fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)
 
         self._processHandler: multiprocessing.Process | None = None
+        self._event: Event = multiprocessing.Event()
         self._queue: multiprocessing.Queue = multiprocessing.Queue()
 
     def _processHandle(self):
         setproctitle.setproctitle(setproctitle.getproctitle() + ':CheeseLog')
 
-        flag = True
-        parentProcess = psutil.Process(os.getppid())
-
-        while flag or not self._queue.empty():
+        while not self._event.is_set():
             try:
                 if self.fileExpire.total_seconds():
                     try:
@@ -57,7 +56,7 @@ class Logger:
                     except:
                         ...
 
-                data = self._queue.get(timeout = 0.016)
+                data = self._queue.get()
                 message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
                 try:
@@ -68,11 +67,8 @@ class Logger:
                 os.makedirs(os.path.dirname(filePath), exist_ok = True)
                 with open(filePath, 'a', encoding = 'utf-8') as f:
                     f.write(message)
-            except queue.Empty:
-                if not parentProcess.is_running():
-                    flag = False
             except KeyboardInterrupt:
-                flag = False
+                ...
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         if level not in self.levels:
@@ -117,35 +113,37 @@ class Logger:
                 _message = '\033[F\033[K' + _message
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
 
-        if self.filePath:
-            if self.levels[level].weight < self.logger_weightFilter:
-                return
+        if not self.filePath:
+            return
 
-            if level in self.logger_levelFilter:
-                return
+        if self.levels[level].weight < self.logger_weightFilter:
+            return
 
-            if self.logger_moduleFilter:
-                for key, value in self.logger_moduleFilter.items():
-                    flag = False
-                    for frame in stack:
-                        callingModule = frame.frame.f_locals.get('__name__')
-                        if callingModule and callingModule == key:
-                            flag = True
-                            if isinstance(value, int):
-                                if self.levels[level].weight <= value:
-                                    return
-                            elif isinstance(value, Set):
-                                if level in value:
-                                    return
-                            break
-                    if flag:
+        if level in self.logger_levelFilter:
+            return
+
+        if self.logger_moduleFilter:
+            for key, value in self.logger_moduleFilter.items():
+                flag = False
+                for frame in stack:
+                    callingModule = frame.frame.f_locals.get('__name__')
+                    if callingModule and callingModule == key:
+                        flag = True
+                        if isinstance(value, int):
+                            if self.levels[level].weight <= value:
+                                return
+                        elif isinstance(value, Set):
+                            if level in value:
+                                return
                         break
+                if flag:
+                    break
 
-            for pattern in self.logger_contentFilter:
-                if re.search(pattern, message):
-                    return
+        for pattern in self.logger_contentFilter:
+            if re.search(pattern, message):
+                return
 
-            self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
+        self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
 
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
@@ -183,6 +181,12 @@ class Logger:
     def encode(self, message: str) -> str:
         return message.replace('<', '&lt;').replace('>', '&gt;').replace('%', '%%')
 
+    def destroy(self):
+        self._event.set()
+        self._processHandler.join()
+        self._event.clear()
+        self._processHandler = None
+
     @property
     def filePath(self) -> str:
         return self._filePath
@@ -195,8 +199,9 @@ class Logger:
             self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
             self._processHandler.start()
         elif not self.filePath and self._processHandler:
-            self._processHandler.terminate()
+            self._event.set()
             self._processHandler.join()
+            self._event.clear()
             self._processHandler = None
 
 logger = Logger()

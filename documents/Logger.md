@@ -156,3 +156,9 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ## **`logger.encode(message: str) -> str`**
 
 当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
+
+## **`logger.destroy()`**
+
+若设置了`logger.filePath`，请在程序结束前一定使用该函数以摧毁所有log程序。
+
+若未设置，调用它并不不会发生什么事。
