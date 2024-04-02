@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, multiprocessing, time
+import inspect, datetime, sys, re, os, multiprocessing, time, queue
 from typing import Dict, Set
 from multiprocessing.synchronize import Event
 
@@ -56,7 +56,7 @@ class Logger:
                     except:
                         ...
 
-                data = self._queue.get()
+                data = self._queue.get(timeout = 0.016)
                 message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
                 try:
@@ -68,6 +68,8 @@ class Logger:
                 with open(filePath, 'a', encoding = 'utf-8') as f:
                     f.write(message)
             except KeyboardInterrupt:
+                ...
+            except queue.Empty:
                 ...
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
