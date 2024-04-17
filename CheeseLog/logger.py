@@ -56,7 +56,7 @@ class Logger:
                     except:
                         ...
 
-                data = self._queue.get(timeout = 0.016)
+                data = self._queue.get()
                 message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
                 try:
@@ -68,8 +68,6 @@ class Logger:
                 with open(filePath, 'a', encoding = 'utf-8') as f:
                     f.write(message)
             except KeyboardInterrupt:
-                ...
-            except queue.Empty:
                 ...
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
@@ -185,6 +183,7 @@ class Logger:
 
     def destroy(self):
         self._event.set()
+        self._processHandler.terminate()
         self._processHandler.join()
         self._event.clear()
         self._processHandler = None
