@@ -183,8 +183,9 @@ class Logger:
 
     def destroy(self):
         self._event.set()
-        self._processHandler.terminate()
-        self._processHandler.join()
+        if self._processHandler:
+            self._processHandler.terminate()
+            self._processHandler.join()
         self._event.clear()
         self._processHandler = None
 
