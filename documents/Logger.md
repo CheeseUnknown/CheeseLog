@@ -32,9 +32,7 @@ from CheeseAPI import logger
 
 ## **`logger.levels: Dict[str, Level] = ...`**
 
-更多的请查看[Level]('./Level.md')。
-
-创建一个自定义的消息等级并打印：
+【只读】 创建一个自定义的消息等级并打印：
 
 ```python
 from CheeseLog import logger, Level
@@ -42,6 +40,8 @@ from CheeseLog import logger, Level
 logger.levels['MY_LEVEL'] = Level(40, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c')
 logger.default('MY_LEVEL', 'Hello World')
 ```
+
+更多的请查看[Level]('./Level.md')。
 
 ## **`logger.weightFilter: int = 0`**
 
@@ -65,7 +65,7 @@ logger.moduleFilter['Xxx'] = 20
 logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 ```
 
-## **`logger.contentFilter: Set[re.Match] = set()`**
+## **`logger.contentFilter: Set[str] = set()`**
 
 对匹配的内容进行过滤，优先级最低。
 
@@ -81,7 +81,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 同`logger.moduleFilter`，在其之后进行日志过滤。
 
-## **`logger.logger_contentFilter: Set[re.Match] = set()`**
+## **`logger.logger_contentFilter: Set[str] = set()`**
 
 同`logger.contentFilter`，在其之后进行日志过滤。
 
@@ -101,7 +101,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 日志的过期时间，超过该期限的日志将被删除，仅在日志名为日期模板时生效。
 
-请不要设置毫秒级的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
+请设置以天或月为最小单位的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
 
 ## **`logger.default(level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 

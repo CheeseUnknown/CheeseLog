@@ -39,14 +39,14 @@ for i in range(101):
 
 - **leftStr**
 
-    完成的进度字符。
+    完成的进度字符（左侧字符）。
 
 - **rightStr**
 
-    未完成的进度字符。
+    未完成的进度字符（右侧字符）。
 
-### **`def __call__(self, value: NonNegativeFloat) -> Tuple[str, str]`**
+### **`def __call__(self, value: float) -> Tuple[str, str]`**
 
 - **value**
 
-    百分数。
+    百分数，范围[0, 1]。

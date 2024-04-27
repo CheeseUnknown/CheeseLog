@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, multiprocessing, time, queue
+import inspect, datetime, sys, re, os, multiprocessing, time
 from typing import Dict, Set
 from multiprocessing.synchronize import Event
 
@@ -9,10 +9,10 @@ from CheeseLog.level import Level
 
 class Logger:
     def __init__(self):
-        self.messageTemplate: str = '(%l) %t > %c'
-        self.styledMessageTemplate: str = '(<black>%l</black>) <black>%t</black> > %c'
-        self.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'
-        self.levels: Dict[str, Level] = {
+        self._messageTemplate: str = '(%l) %t > %c'
+        self._styledMessageTemplate: str = '(<black>%l</black>) <black>%t</black> > %c'
+        self._timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'
+        self._levels: Dict[str, Level] = {
             'DEBUG': Level(10),
             'INFO': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
             'STARTING': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
@@ -26,19 +26,19 @@ class Logger:
             'ERROR': Level(50, styledMessageTemplate = '(<magenta>%l</magenta>) <black>%t</black> > %c')
         }
 
-        self.weightFilter: int = 0
-        self.levelFilter: Set[str] = set()
-        self.moduleFilter: Dict[str, int | Set[str]] = {}
-        self.contentFilter: Set[re.Match] = set()
-        self.logger_weightFilter: int = 0
-        self.logger_levelFilter: Set[str] = set([ 'LOADING' ])
-        self.logger_moduleFilter: Dict[str, int | Set[str]] = {}
-        self.logger_contentFilter: Set[re.Match] = set()
+        self._weightFilter: int = 0
+        self._levelFilter: Set[str] = set()
+        self._moduleFilter: Dict[str, int | Set[str]] = {}
+        self._contentFilter: Set[str] = set()
+        self._logger_weightFilter: int = 0
+        self._logger_levelFilter: Set[str] = set([ 'LOADING' ])
+        self._logger_moduleFilter: Dict[str, int | Set[str]] = {}
+        self._logger_contentFilter: Set[str] = set()
 
-        self.styled: bool = True
+        self._styled: bool = True
 
         self._filePath: str = ''
-        self.fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)
+        self._fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)
 
         self._processHandler: multiprocessing.Process | None = None
         self._event: Event = multiprocessing.Event()
@@ -176,18 +176,213 @@ class Logger:
         self.default('LOADED', message, styledMessage, end = end, refreshed = refreshed)
 
     def loading(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True):
+        '''
+        注意，该命令是覆盖的。
+        '''
+
         self.default('LOADING', message, styledMessage, end = end, refreshed = refreshed)
 
     def encode(self, message: str) -> str:
+        '''
+        当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
+        '''
+
         return message.replace('<', '&lt;').replace('>', '&gt;').replace('%', '%%')
 
     def destroy(self):
+        '''
+        若设置了`logger.filePath`，请在程序结束前一定使用该函数以摧毁所有log程序。
+
+        若未设置，调用它并不不会发生什么事。
+        '''
+
         self._event.set()
         if self._processHandler:
             self._processHandler.terminate()
             self._processHandler.join()
         self._event.clear()
         self._processHandler = None
+
+    @property
+    def messageTemplate(self) -> str:
+        '''
+        消息模版，使用占位符替换内容：
+
+        - %l: 消息等级的key。
+
+        - %t: 时间模版。
+
+        - %c: 消息内容。
+
+        该模版是默认模版。
+        '''
+
+        return self._messageTemplate
+
+    @messageTemplate.setter
+    def messageTemplate(self, value: str):
+        self._messageTemplate = value
+
+    @property
+    def styledMessageTemplate(self) -> str:
+        '''
+        消息样式模版，与`logger.messageTemplate`相同。仅在`logger.styled == True`时生效。
+
+        该模版是默认模版。
+        '''
+
+        return self._styledMessageTemplate
+
+    @styledMessageTemplate.setter
+    def styledMessageTemplate(self, value: str):
+        self._styledMessageTemplate = value
+
+    @property
+    def timerTemplate(self) -> str:
+        '''
+        使用`strftime`进行日期处理。
+
+        该模版是默认模版。
+        '''
+
+        return self._timerTemplate
+
+    @timerTemplate.setter
+    def timerTemplate(self, value: str):
+        self._timerTemplate = value
+
+    @property
+    def levels(self) -> Dict[str, Level]:
+        '''
+        【只读】 创建一个自定义的消息等级并打印：
+
+        ```python
+        from CheeseLog import logger, Level
+
+        logger.levels['MY_LEVEL'] = Level(40, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c')
+        logger.default('MY_LEVEL', 'Hello World')
+        ```
+        '''
+
+        return self._levels
+
+    @property
+    def weightFilter(self) -> int:
+        '''
+        权重过滤，优先级最高。
+        '''
+
+        return self._weightFilter
+
+    @weightFilter.setter
+    def weightFilter(self, value: int):
+        self._weightFilter = value
+
+    @property
+    def levelFilter(self) -> Set[str]:
+        '''
+        指定消息等级过滤，优先级其次。
+        '''
+
+        return self._levelFilter
+
+    @levelFilter.setter
+    def levelFilter(self, value: Set[str]):
+        self._levelFilter = value
+
+    @property
+    def moduleFilter(self) -> Dict[str, int | Set[str]]:
+        '''
+        指定模块的消息等级过滤，优先级再次。
+
+        ```python
+        from CheeseLog import logger
+
+        # 两者只能选其一
+        # 指定模块的消息等级权重过滤
+        logger.moduleFilter['Xxx'] = 20
+        # 指定模块的指定消息等级过滤
+        logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
+        ```
+        '''
+
+        return self._moduleFilter
+
+    @moduleFilter.setter
+    def moduleFilter(self, value: Dict[str, int | Set[str]]):
+        self._moduleFilter = value
+
+    @property
+    def contentFilter(self) -> Set[str]:
+        '''
+        对匹配的内容进行过滤，优先级最低。
+        '''
+
+        return self._contentFilter
+
+    @contentFilter.setter
+    def contentFilter(self, value: Set[str]):
+        self._contentFilter = value
+
+    @property
+    def logger_weightFilter(self) -> int:
+        '''
+        同`logger.weightFilter`，在其之后进行日志过滤。
+        '''
+
+        return self._logger_weightFilter
+
+    @logger_weightFilter.setter
+    def logger_weightFilter(self, value: int):
+        self._logger_weightFilter = value
+
+    @property
+    def logger_levelFilter(self) -> Set[str]:
+        '''
+        同`logger.levelFilter`，在其之后进行日志过滤。
+        '''
+
+        return self._logger_levelFilter
+
+    @logger_levelFilter.setter
+    def logger_levelFilter(self, value: Set[str]):
+        self._logger_levelFilter = value
+
+    @property
+    def logger_moduleFilter(self) -> Dict[str, int | Set[str]]:
+        '''
+        同`logger.moduleFilter`，在其之后进行日志过滤。
+        '''
+
+        return self._logger_moduleFilter
+
+    @logger_moduleFilter.setter
+    def logger_moduleFilter(self, value: Dict[str, int | Set[str]]):
+        self._logger_moduleFilter = value
+
+    @property
+    def logger_contentFilter(self) -> Set[str]:
+        '''
+        同`logger.contentFilter`，在其之后进行日志过滤。
+        '''
+
+        return self._logger_contentFilter
+
+    @logger_contentFilter.setter
+    def logger_contentFilter(self, value: Set[str]):
+        self._logger_contentFilter = value
+
+    @property
+    def styled(self) -> bool:
+        '''
+        控制台是否打印样式。
+        '''
+
+        return self._styled
+
+    @styled.setter
+    def styled(self, value: bool):
+        self._styled = value
 
     @property
     def filePath(self) -> str:
@@ -205,5 +400,19 @@ class Logger:
             self._processHandler.join()
             self._event.clear()
             self._processHandler = None
+
+    @property
+    def fileExpire(self) -> datetime.timedelta:
+        '''
+        日志的过期时间，超过该期限的日志将被删除，仅在日志名为日期模板时生效。
+
+        请设置以天或月为最小单位的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
+        '''
+
+        return self._fileExpire
+
+    @fileExpire.setter
+    def fileExpire(self, value: datetime.timedelta):
+        self._fileExpire = value
 
 logger = Logger()
