@@ -1,4 +1,4 @@
-import inspect, datetime, sys, re, os, multiprocessing, time
+import inspect, datetime, sys, re, os, multiprocessing, time, queue, signal
 from typing import Dict, Set
 from multiprocessing.synchronize import Event
 
@@ -47,7 +47,8 @@ class Logger:
     def _processHandle(self):
         setproctitle.setproctitle(setproctitle.getproctitle() + ':CheeseLog')
 
-        while not self._event.is_set():
+        block = True
+        while not self._event.is_set() or not self._queue.empty():
             try:
                 if self.fileExpire.total_seconds():
                     try:
@@ -56,7 +57,7 @@ class Logger:
                     except:
                         ...
 
-                data = self._queue.get()
+                data = self._queue.get(block)
                 message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
                 try:
@@ -68,6 +69,8 @@ class Logger:
                 with open(filePath, 'a', encoding = 'utf-8') as f:
                     f.write(message)
             except KeyboardInterrupt:
+                ...
+            except queue.Empty:
                 ...
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
@@ -198,7 +201,7 @@ class Logger:
 
         self._event.set()
         if self._processHandler:
-            self._processHandler.terminate()
+            os.kill(self._processHandler.pid, signal.SIGINT)
             self._processHandler.join()
         self._event.clear()
         self._processHandler = None
@@ -396,10 +399,7 @@ class Logger:
             self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
             self._processHandler.start()
         elif not self.filePath and self._processHandler:
-            self._event.set()
-            self._processHandler.join()
-            self._event.clear()
-            self._processHandler = None
+            self.destroy()
 
     @property
     def fileExpire(self) -> datetime.timedelta:
