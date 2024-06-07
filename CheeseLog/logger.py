@@ -58,7 +58,7 @@ class Logger:
                         ...
 
                 data = self._queue.get(block)
-                message = data[2].strftime(data[3].replace('%l', data[0]).replace('%c', data[1]).replace('%t', data[4])).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
+                message = data[3].replace('%t', data[2].strftime(data[4])).replace('%l', data[0]).replace('%c', data[1]).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
 
                 try:
                     filePath = time.strftime(self.filePath)
@@ -109,9 +109,9 @@ class Logger:
         message = str(message)
         if sys.stdout and sys.stdout.isatty():
             if self.styled:
-                _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', now.strftime((self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%l', level).replace('%c', styledMessage or message).replace('%t', self.timerTemplate)))).replace('\n', '\n    ')
+                _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', (self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', styledMessage or message))).replace('\n', '\n    ')
             else:
-                _message = now.strftime((self.levels[level].messageTemplate or self.messageTemplate).replace('%l', level).replace('%c', message).replace('%t', self.timerTemplate)).replace('\n', '\n    ')
+                _message = (self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', styledMessage or message).replace('\n', '\n    ')
             if refreshed:
                 _message = '\033[F\033[K' + _message
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
