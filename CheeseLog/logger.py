@@ -190,7 +190,7 @@ class Logger:
         当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
         '''
 
-        return message.replace('<', '&lt;').replace('>', '&gt;').replace('%', '%%')
+        return message.replace('<', '&lt;').replace('>', '&gt;')
 
     def destroy(self):
         '''
