@@ -73,7 +73,7 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 同`logger.weightFilter`，在其之后进行日志过滤。
 
-## **`logger.logger_levelFilter: Set[str] = set([ 'LOADING' ])`**
+## **`logger.logger_levelFilter: Set[str] = set([ 'LOADING', 'BUILDING' ])`**
 
 同`logger.levelFilter`，在其之后进行日志过滤。
 
@@ -96,12 +96,6 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 支持日期字符串模板，会动态的更改输出的日志文件。
 
 该参数请在最后设置，若该值不为`''`，则会创建日志输出进程。
-
-## **`logger.fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)`**
-
-日志的过期时间，超过该期限的日志将被删除，仅在日志名为日期模板时生效。
-
-请设置以天或月为最小单位的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
 
 ## **`logger.default(level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
 
@@ -153,12 +147,16 @@ logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
 
 注意，该命令是覆盖的。
 
+## **`logger.built(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+
+消息等级为BUILT的输出函数。
+
+## **`logger.building(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True)`**
+
+消息等级为BUILDING的输出函数。
+
+注意，该命令是覆盖的。
+
 ## **`logger.encode(message: str) -> str`**
 
 当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
-
-## **`logger.destroy()`**
-
-若设置了`logger.filePath`，请在程序结束前一定使用该函数以摧毁所有log程序。
-
-若未设置，调用它并不不会发生什么事。

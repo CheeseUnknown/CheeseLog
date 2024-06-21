@@ -68,8 +68,6 @@ logger.debug('Hello World')
 # 中途修改输出日志是可以的
 logger.filePath = './yourLog.log'
 logger.debug('Hello World')
-
-logger.destroy() # 使用输出日志功能后请使用该函数摧毁
 ```
 
 ### **消息过滤**

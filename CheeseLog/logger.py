@@ -1,8 +1,5 @@
-import inspect, datetime, sys, re, os, multiprocessing, time, queue, signal
+import inspect, datetime, sys, re, os, time
 from typing import Dict, Set
-from multiprocessing.synchronize import Event
-
-import setproctitle
 
 from CheeseLog import style
 from CheeseLog.level import Level
@@ -19,6 +16,8 @@ class Logger:
             'ENDING': Level(20, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c'),
             'LOADING': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
             'LOADED': Level(20, styledMessageTemplate = '(<cyan>%l</cyan>) <black>%t</black> > %c'),
+            'BUILDING': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
+            'BUILT': Level(20, styledMessageTemplate = '(<cyan>%l</cyan>) <black>%t</black> > %c'),
             'HTTP': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
             'WEBSOCKET': Level(20, styledMessageTemplate = '(<blue>%l</blue>) <black>%t</black> > %c'),
             'WARNING': Level(30, styledMessageTemplate = '(<yellow>%l</yellow>) <black>%t</black> > %c'),
@@ -31,47 +30,13 @@ class Logger:
         self._moduleFilter: Dict[str, int | Set[str]] = {}
         self._contentFilter: Set[str] = set()
         self._logger_weightFilter: int = 0
-        self._logger_levelFilter: Set[str] = set([ 'LOADING' ])
+        self._logger_levelFilter: Set[str] = set([ 'LOADING', 'BUILDING' ])
         self._logger_moduleFilter: Dict[str, int | Set[str]] = {}
         self._logger_contentFilter: Set[str] = set()
 
         self._styled: bool = True
 
-        self._filePath: str = ''
-        self._fileExpire: datetime.timedelta = datetime.timedelta(seconds = 0)
-
-        self._processHandler: multiprocessing.Process | None = None
-        self._event: Event = multiprocessing.Event()
-        self._queue: multiprocessing.Queue = multiprocessing.Queue()
-
-    def _processHandle(self):
-        setproctitle.setproctitle(setproctitle.getproctitle() + ':CheeseLog')
-
-        block = True
-        while not self._event.is_set() or not self._queue.empty():
-            try:
-                if self.fileExpire.total_seconds():
-                    try:
-                        fileExpire = (datetime.datetime.now() - self.fileExpire).strftime(self.filePath)
-                        os.remove(fileExpire)
-                    except:
-                        ...
-
-                data = self._queue.get(block)
-                message = data[3].replace('%t', data[2].strftime(data[4])).replace('%l', data[0]).replace('%c', data[1]).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n'
-
-                try:
-                    filePath = time.strftime(self.filePath)
-                except:
-                    filePath = self.filePath
-
-                os.makedirs(os.path.dirname(filePath), exist_ok = True)
-                with open(filePath, 'a', encoding = 'utf-8') as f:
-                    f.write(message)
-            except KeyboardInterrupt:
-                ...
-            except queue.Empty:
-                ...
+        self.filePath: str = ''
 
     def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         if level not in self.levels:
@@ -111,7 +76,7 @@ class Logger:
             if self.styled:
                 _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', (self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', styledMessage or message))).replace('\n', '\n    ')
             else:
-                _message = (self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', styledMessage or message).replace('\n', '\n    ')
+                _message = (self.levels[level].messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', message).replace('\n', '\n    ')
             if refreshed:
                 _message = '\033[F\033[K' + _message
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
@@ -146,7 +111,14 @@ class Logger:
             if re.search(pattern, message):
                 return
 
-        self._queue.put((level, message, now, self.levels[level].messageTemplate or self.messageTemplate, self.timerTemplate))
+        try:
+            filePath = time.strftime(self.filePath)
+        except:
+            filePath = self.filePath
+
+        os.makedirs(os.path.dirname(filePath), exist_ok = True)
+        with open(filePath, 'a', encoding = 'utf-8') as f:
+            f.write((self.levels[level].messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', message).replace('\n', '\n    ') + '\n')
 
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
@@ -191,20 +163,6 @@ class Logger:
         '''
 
         return message.replace('<', '&lt;').replace('>', '&gt;')
-
-    def destroy(self):
-        '''
-        若设置了`logger.filePath`，请在程序结束前一定使用该函数以摧毁所有log程序。
-
-        若未设置，调用它并不不会发生什么事。
-        '''
-
-        self._event.set()
-        if self._processHandler:
-            os.kill(self._processHandler.pid, signal.SIGINT)
-            self._processHandler.join()
-        self._event.clear()
-        self._processHandler = None
 
     @property
     def messageTemplate(self) -> str:
@@ -386,33 +344,5 @@ class Logger:
     @styled.setter
     def styled(self, value: bool):
         self._styled = value
-
-    @property
-    def filePath(self) -> str:
-        return self._filePath
-
-    @filePath.setter
-    def filePath(self, value: str):
-        self._filePath = value
-
-        if self.filePath and not self._processHandler:
-            self._processHandler = multiprocessing.Process(target = self._processHandle, name = setproctitle.getproctitle() + ':CheeseLog')
-            self._processHandler.start()
-        elif not self.filePath and self._processHandler:
-            self.destroy()
-
-    @property
-    def fileExpire(self) -> datetime.timedelta:
-        '''
-        日志的过期时间，超过该期限的日志将被删除，仅在日志名为日期模板时生效。
-
-        请设置以天或月为最小单位的值，并保证日志名称的最小间隔为该过期时间，如以day为最小日期的日志名称模板必须以day为过期时间。
-        '''
-
-        return self._fileExpire
-
-    @fileExpire.setter
-    def fileExpire(self, value: datetime.timedelta):
-        self._fileExpire = value
 
 logger = Logger()
