@@ -46,7 +46,7 @@ class ProgressBar:
         left = round(value * self.length)
         right = self.length - left
 
-        return self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '{:.2f}'.format(value * 100)), self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '<blue>{:.2f}</blue>'.format(value * 100)).replace('%', '%%')
+        return self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '{:.2f}'.format(value * 100)), self.template.replace('%b', self.boundaryStr).replace('%l', self.leftStr * left).replace('%r', self.rightStr * right).replace('%p', '<blue>{:.2f}</blue>'.format(value * 100))
 
     @property
     def length(self) -> int:
