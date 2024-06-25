@@ -157,6 +157,16 @@ class Logger:
 
         self.default('LOADING', message, styledMessage, end = end, refreshed = refreshed)
 
+    def built(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
+        self.default('BUILT', message, styledMessage, end = end, refreshed = refreshed)
+
+    def building(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True):
+        '''
+        注意，该命令是覆盖的。
+        '''
+
+        self.default('BUILDING', message, styledMessage, end = end, refreshed = refreshed)
+
     def encode(self, message: str) -> str:
         '''
         当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
