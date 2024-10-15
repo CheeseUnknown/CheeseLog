@@ -1,5 +1,16 @@
 class Level:
     def __init__(self, weight: int, messageTemplate: str | None = None, timerTemplate: str | None = None, styledMessageTemplate: str | None = None):
+        '''
+        - Args
+            - weight: 权重，更高的权重意味着更危险的信息
+
+            - messageTemplate: 消息模版，未设置时默认为`logger.messageTemplate`
+
+            - timerTemplate: 消息样式模版，未设置时默认为`logger.styledMessageTemplate`
+
+            - styledMessageTemplate: 日期模版，未设置时默认为`logger.timerTemplate`
+        '''
+
         self._weight: int = weight
         self._messageTemplate: str | None = messageTemplate
         self._timerTemplate: str | None = timerTemplate
@@ -8,7 +19,7 @@ class Level:
     @property
     def weight(self) -> int:
         '''
-        权重。更高的权重意味着更危险的信息。
+        权重，更高的权重意味着更危险的信息
         '''
 
         return self._weight
@@ -20,7 +31,7 @@ class Level:
     @property
     def messageTemplate(self) -> str | None:
         '''
-        消息模版，未设置时默认为`logger.messageTemplate`。
+        消息模版，未设置时默认为`logger.messageTemplate`
         '''
 
         return self._messageTemplate
@@ -32,7 +43,7 @@ class Level:
     @property
     def styledMessageTemplate(self) -> str | None:
         '''
-        消息样式模版，未设置时默认为`logger.styledMessageTemplate`。
+        消息样式模版，未设置时默认为`logger.styledMessageTemplate`
         '''
 
         return self._styledMessageTemplate
@@ -44,7 +55,7 @@ class Level:
     @property
     def timerTemplate(self) -> str | None:
         '''
-        日期模版，未设置时默认为`logger.timerTemplate`。
+        日期模版，未设置时默认为`logger.timerTemplate`
         '''
 
         return self._timerTemplate

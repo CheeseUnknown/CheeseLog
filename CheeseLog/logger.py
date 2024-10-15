@@ -38,14 +38,15 @@ class Logger:
 
         self.filePath: str = ''
 
-    def default(self, level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
-        if level not in self.levels:
+    def default(self, levelKey: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
+        if levelKey not in self.levels:
             raise KeyError('No level with this key')
 
-        if self.levels[level].weight < self.weightFilter:
+        level = self.levels[levelKey]
+        if level.weight < self.weightFilter:
             return
 
-        if level in self.levelFilter:
+        if levelKey in self.levelFilter:
             return
 
         if self.moduleFilter:
@@ -54,40 +55,40 @@ class Logger:
                 flag = False
                 for frame in stack:
                     callingModule = frame.frame.f_locals.get('__name__')
-                    if callingModule and callingModule == key:
+                    if callingModule == key:
                         flag = True
                         if isinstance(value, int):
-                            if self.levels[level].weight <= value:
+                            if level.weight <= value:
                                 return
                         elif isinstance(value, Set):
-                            if level in value:
+                            if levelKey in value:
                                 return
                         break
                 if flag:
                     break
 
-        for pattern in self.contentFilter:
-            if re.search(pattern, message):
-                return
+        if self.contentFilter:
+            for pattern in self.contentFilter:
+                if re.search(pattern, message):
+                    return
 
         now = datetime.datetime.now()
-        message = str(message)
         if sys.stdout and sys.stdout.isatty():
             if self.styled:
-                _message = re.sub(r'<.+?>', lambda s: '\033[' + getattr(style, s[0][1:-1].upper())[0] + 'm', re.sub(r'</.+?>', lambda s: '\033[' + getattr(style, s[0][2:-1].upper())[1] + 'm', (self.levels[level].styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', styledMessage or message))).replace('\n', '\n    ')
+                _message = re.sub(r'<.+?>', lambda s: f'\033[{getattr(style, s[0][1:-1].upper())[0]}m', re.sub(r'</.+?>', lambda s: f'\033[{getattr(style, s[0][2:-1].upper())[1]}m', (level.styledMessageTemplate or self.styledMessageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', levelKey).replace('%c', f'{styledMessage or message}'))).replace('\n', '\n    ')
             else:
-                _message = (self.levels[level].messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', message).replace('\n', '\n    ')
+                _message = (level.messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', levelKey).replace('%c', f'{message}').replace('\n', '\n    ')
             if refreshed:
-                _message = '\033[F\033[K' + _message
+                _message = f'\033[F\033[K{_message}'
             print(_message.replace('&lt;', '<').replace('&gt;', '>'), end = end)
 
         if not self.filePath:
             return
 
-        if self.levels[level].weight < self.logger_weightFilter:
+        if level.weight < self.logger_weightFilter:
             return
 
-        if level in self.logger_levelFilter:
+        if levelKey in self.logger_levelFilter:
             return
 
         if self.logger_moduleFilter:
@@ -95,21 +96,22 @@ class Logger:
                 flag = False
                 for frame in stack:
                     callingModule = frame.frame.f_locals.get('__name__')
-                    if callingModule and callingModule == key:
+                    if callingModule == key:
                         flag = True
                         if isinstance(value, int):
-                            if self.levels[level].weight <= value:
+                            if level.weight <= value:
                                 return
                         elif isinstance(value, Set):
-                            if level in value:
+                            if levelKey in value:
                                 return
                         break
                 if flag:
                     break
 
-        for pattern in self.logger_contentFilter:
-            if re.search(pattern, message):
-                return
+        if self.logger_contentFilter:
+            for pattern in self.logger_contentFilter:
+                if re.search(pattern, message):
+                    return
 
         try:
             filePath = time.strftime(self.filePath)
@@ -118,7 +120,7 @@ class Logger:
 
         os.makedirs(os.path.dirname(filePath), exist_ok = True)
         with open(filePath, 'a', encoding = 'utf-8') as f:
-            f.write((self.levels[level].messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', level).replace('%c', message).replace('\n', '\n    ') + '\n')
+            f.write((level.messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', levelKey).replace('%c', message).replace('\n', '\n    ') + '\n')
 
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
