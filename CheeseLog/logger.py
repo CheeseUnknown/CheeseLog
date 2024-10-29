@@ -120,7 +120,7 @@ class Logger:
 
         os.makedirs(os.path.dirname(filePath), exist_ok = True)
         with open(filePath, 'a', encoding = 'utf-8') as f:
-            f.write((level.messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', levelKey).replace('%c', message).replace('\n', '\n    ') + '\n')
+            f.write((level.messageTemplate or self.messageTemplate).replace('%t', now.strftime(self.timerTemplate)).replace('%l', levelKey).replace('%c', message).replace('\n', '\n    ').replace('&lt;', '<').replace('&gt;', '>') + '\n')
 
     def debug(self, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False):
         self.default('DEBUG', message, styledMessage, end = end, refreshed = refreshed)
