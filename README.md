@@ -14,83 +14,77 @@
 
 目前仍处于开发阶段，各种功能并不保证以后的支持。
 
-## **安装**
-
-系统要求：Linux。
-
-Python要求：目前仅保证支持3.11及以上的python。
-
-```bash
-pip install CheeseLog
-```
-
 ## **示例**
 
-### **基本用法**
-
-打印各种类型的Hello World，更多的内置方法请查看[Logger](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)。
+### **带有日志文件输出的简易应用**
 
 ```python
-from CheeseLog import logger
+from CheeseLog import CheeseLogger, Message
 
-logger.debug('Hello World')
-logger.info('Hello World')
-logger.warning('Hello World')
-logger.danger('Hello World')
-logger.error('Hello World')
+logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
+
+logger.debug('This is a debug message.')
+logger.info('This is an info message.')
+logger.warning('This is a warning message.')
+logger.danger('This is a danger message.')
+logger.error('This is an error message.')
+
+logger.addMessage(Message('CUSTOM', 30, messageTemplate_styled = '(<blue>%k</blue>) <black>%t</black> > %c'))
+logger.print('This is a custom message.', messageKey = 'CUSTOM')
 ```
 
-### **样式打印**
-
-更多样式请查看[Style](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Style.md)。
+### **简单的消息过滤**
 
 ```python
-from CheeseLog import logger
+from CheeseLog import CheeseLogger, Message
 
-# 如果没有日志文件输出，可以在message直接使用样式
-logger.debug('<green>Hello World</green>')
+logger = CheeseLogger(key = 'myLogger')
+logger.setFilter({
+    'weight': 20,
+    'messageKeys': [ 'FILTERED' ]
+})
 
-# 因为message会被记录到日志文件中
-logger.debug('Hello World', '<green>Hello World</green>')
+lowWeight_message = Message('LOW_WEIGHT', 10)
+logger.addMessage(lowWeight_message)
+highWeight_message = Message('HIGH_WEIGHT', 50)
+logger.addMessage(highWeight_message)
+filtered_message = Message('FILTERED', 100)
+logger.addMessage(filtered_message)
 
-# 如果内容有'<'和'>'的组合，请对部分内容进行加密
-logger.debug(logger.encode('<p>Hello World</p>'))
+logger.print('This is a low weight message.', messageKey = 'LOW_WEIGHT') # 不会输出
+logger.print('This is a high weight message.', messageKey = 'HIGH_WEIGHT')
+logger.print('This is a filtered message.', messageKey = 'FILTERED') # 不会输出
 ```
 
-### **日志输出**
+### **如何使用进度条实现一个loading效果**
 
 ```python
-from CheeseLog import logger
+import time, random
 
-logger.filePath = './myLog.log'
+from CheeseLog import CheeseLogger, Message, ProgressBar
 
-logger.debug('Hello World')
-# 中途修改输出日志是可以的
-logger.filePath = './yourLog.log'
-logger.debug('Hello World')
-```
+logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
 
-### **消息过滤**
+loadingMessage = Message('LOADING')
+logger.addMessage(loadingMessage)
+loadedMessage = Message('LOADED', 20, messageTemplate_styled = '(<green>%k</green>) <black>%t</black> > %c')
+logger.addMessage(loadedMessage)
 
-更多消息过滤信息请看[Logger](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)。
-
-更多消息等级信息请看[Level](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Level.md)。
-
-```python
-from CheeseLog import logger
-
-logger.filePath = './myLog.log'
-logger.weightFilter = 20 # 权重过滤，优先级最高
-logger.levelFilter.add('DANGER') # 指定消息等级过滤，优先级其次
-logger.moduleFilter['Xxx'] = 100 # 指定模块过滤，优先级最后
-...
+progressbar = ProgressBar()
+i = 0
+while i < 100:
+    bar, bar_styled = progressbar(i / 100)
+    logger.print(bar, bar_styled, messageKey = 'LOADING', refresh = i != 0)
+    time.sleep(random.uniform(0.05, 0.15))
+    i += random.uniform(0.5, 1)
+logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
 ```
 
 ## **更多...**
 
 ### 1. [**Style**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Style.md)
 
-### 2. [**Level**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Level.md)
+### 2. [**Message**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Message.md)
 
 ### 3. [**Logger**](https://github.com/CheeseUnknown/CheeseLog/blob/master/documents/Logger.md)
 

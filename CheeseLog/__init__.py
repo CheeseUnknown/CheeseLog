@@ -1,4 +1,4 @@
-from CheeseLog.logger import logger
-from CheeseLog.progressBar import ProgressBar
-from CheeseLog.level import Level
 from CheeseLog.style import *
+from CheeseLog.logger import CheeseLogger
+from CheeseLog.message import Message
+from CheeseLog.progressBar import ProgressBar

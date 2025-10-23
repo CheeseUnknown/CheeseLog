@@ -3,160 +3,121 @@
 日志系统的主体。
 
 ```python
-from CheeseAPI import logger
+from CheeseLog import CheeseLogger
 ```
 
-## **`logger.messageTemplate: str = '(%l) %t > %c'`**
+## **`CheeseLogger.instances: dict[str, CheeseLogger] = {}`**
 
-消息模版，使用占位符替换内容：
+所有CheeseLogger实例
 
-| key | description |
-| - | - |
-| %l | 消息等级的key |
-| %t | 时间模版 |
-| %c | 消息内容 |
+## **`def __init__(self, key: str | None = None, filePath: str | None = None, *, messages: dict[str, Message] = {}, messageTemplate: str = '(%k) %t > %c', timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f', messageTemplate_styled: str = '(<black>%k</black>) <black>%t</black> > %c', filter: CheeseLog.Filter = {})`**
 
-该模版是默认模版。
+- **filePath**
 
-## **`logger.styledMessageTemplate: str = '(<black>%l</black>) <black>%t</black> > %c'`**
+    日志文件路径，若不设置则不会写入文件
 
-消息样式模版，与`logger.messageTemplate`相同。仅在`logger.styled == True`时生效。
+- **messages**
 
-该模版是默认模版。
+    消息类型
 
-## **`logger.timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f'`**
+- **messageTemplate**
 
-使用`strftime`进行日期处理。
+    消息模版；支持的占位符有：
 
-该模版是默认模版。
+    - %k: key
+    - %t: 时间模版
+    - %c: 内容
 
-## **`logger.levels: Dict[str, Level] = ...`**
+- **timerTemplate**
 
-【只读】 创建一个自定义的消息等级并打印：
+    时间模版
 
-```python
-from CheeseLog import logger, Level
+- **messageTemplate_styled**
 
-logger.levels['MY_LEVEL'] = Level(40, styledMessageTemplate = '(<green>%l</green>) <black>%t</black> > %c')
-logger.default('MY_LEVEL', 'Hello World')
-```
+    带样式的消息模版；支持的占位符有：
 
-更多的请查看[Level]('./Level.md')。
+    - %k: key
+    - %t: 时间模版
+    - %c: 内容
 
-## **`logger.weightFilter: int = 0`**
+- **filter**
 
-权重过滤，优先级最高。
+    过滤器
 
-## **`logger.levelFilter: Set[str] = set()`**
+## **`self.key: str`**
 
-指定消息等级过滤，优先级其次。
+## **`self.filePath: str | None`**
 
-## **`logger.moduleFilter: Dict[str, int | Set[str]] = {}`**
+    日志文件路径
 
-指定模块的消息等级过滤，优先级再次。
+## **`self.messages: dict[str, CheeseLog.Message]`**
 
-```python
-from CheeseLog import logger
+## **`self.messageTemplate: str`**
 
-# 两者只能选其一
-# 指定模块的消息等级权重过滤
-logger.moduleFilter['Xxx'] = 20
-# 指定模块的指定消息等级过滤
-logger.moduleFilter['Xxx'] = set([ 'DEBUG', 'WARNING' ])
-```
+消息模版
 
-## **`logger.contentFilter: Set[str] = set()`**
+## **`self.timerTemplate: str`**
 
-对匹配的内容进行过滤，优先级最低。
+时间模版
 
-## **`logger.logger_weightFilter: int = 0`**
+## **`self.messageTemplate_styled: str`**
 
-同`logger.weightFilter`，在其之后进行日志过滤。
+带样式的消息模版
 
-## **`logger.logger_levelFilter: Set[str] = set([ 'LOADING', 'BUILDING' ])`**
+## **`self.filter: CheeseLog.Filter`**
 
-同`logger.levelFilter`，在其之后进行日志过滤。
+过滤器
 
-## **`logger.logger_moduleFilter: Dict[str, int | Set[str]] = {}`**
+## **`self.is_running: bool`**
 
-同`logger.moduleFilter`，在其之后进行日志过滤。
+## **`self.has_console: bool`**
 
-## **`logger.logger_contentFilter: Set[str] = set()`**
+是否有控制台输出
 
-同`logger.contentFilter`，在其之后进行日志过滤。
+## **`def addMessage(self, message: CheeseLog.Message)`**
 
-## **`logger.styled: bool = True`**
+## **`def deleteMessage(self, key: str)`**
 
-控制台是否打印样式。
+## **`def start(self)`**
 
-## **`logger.filePath: str = ''`**
+## **`def stop(self)`**
 
-该值不为`''`时，尝试将消息输出到日志文件中。
+## **`def setFilter(self, filter: CheeseLog.Filter)`**
 
-支持日期字符串模板，会动态的更改输出的日志文件。
+## **`def print(self, content: str, content_styled: str | None = None, messageKey: str = 'DEBUG', *, end: str = '\n', refresh: bool = False)`**
 
-该参数请在最后设置，若该值不为`''`，则会创建日志输出进程。
+- **Args**
 
-## **`logger.default(level: str, message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+    - **content**
 
-默认的输出函数。如果使用的是自定义消息等级，请使用该函数手动输入等级。
+        消息内容
 
-- **refreshed**
+    - **key**
 
-    为`True`时会将当前行覆盖。
+        消息类型
 
-## **`logger.debug(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+    - **content_styled**
 
-消息等级为DEBUG的输出函数。
+        带样式的消息内容
 
-## **`logger.info(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+    - **end**
 
-消息等级为INFO的输出函数。
+        结尾符
 
-## **`logger.starting(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+    - **refresh**
 
-消息等级为STARTING的输出函数。
+        是否刷新终端输出
 
-## **`logger.ending(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+## **`def debug(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
-消息等级为ENDING的输出函数。
+## **`def info(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
-## **`logger.warning(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+## **`def warning(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
-消息等级为WARNING的输出函数。
+## **`def danger(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
-## **`logger.danger(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
+## **`def error(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
-消息等级为DANGER的输出函数。
+## **`def encode(self, content: str) -> str`**
 
-## **`logger.websocket(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
-
-消息等级为WEBSOCKET的输出函数。
-
-## **`logger.http(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
-
-消息等级为HTTP的输出函数。
-
-## **`logger.loaded(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
-
-消息等级为LOADED的输出函数。
-
-## **`logger.loading(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True)`**
-
-消息等级为LOADING的输出函数。
-
-注意，该命令是覆盖的。
-
-## **`logger.built(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = False)`**
-
-消息等级为BUILT的输出函数。
-
-## **`logger.building(message: str, styledMessage: str | None = None, *, end: str = '\n', refreshed: bool = True)`**
-
-消息等级为BUILDING的输出函数。
-
-注意，该命令是覆盖的。
-
-## **`logger.encode(message: str) -> str`**
-
-当消息中有`'<'`和`'>'`字符时，容易与样式格式产生冲突。使用该函数对冲突部分进行加密，可以防止冲突。
+    当内容中有`'<'`和`'>'`字符时，进行转义

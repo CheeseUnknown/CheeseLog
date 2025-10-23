@@ -3,20 +3,10 @@
 CheeseLog提供了一个自定义的进度条，配合loading可以达到更好的使用效果。
 
 ```python
-import time
-
-from CheeseLog import logger, ProgressBar
-
-progressBar = ProgressBar()
-for i in range(101):
-    message, styledMessage = progressBar(i / 100)
-    logger.loading(message, styledMessage)
-    time.sleep(0.1)
+from CheeseLog import ProgressBar
 ```
 
-## **`class ProgressBar`**
-
-### **`def __init__(self, length: int = 20, template: str = '%b%l%r%b %p', *, boundaryStr: str = '|', leftStr: str = '█', rightStr: str = '-')`**
+## **`def __init__(self, length: int = 20, *, template: str = '%b%f%e%b %p%', template_styled: str = '%b%f%e%b <blue>%p</blue>%', boundaryChar: str = '|', fillChar: str = '█', emptyChar: str = '░')`**
 
 - **length**
 
@@ -24,28 +14,29 @@ for i in range(101):
 
 - **template**
 
-    模版，通过占位符匹配内容：
+    进度条模板；支持的占位符有：
+    - %b: 边界字符
+    - %f: 进度条主体
+    - %e: 已完成部分
+    - %p: 百分比
 
-    | key | description |
-    | - | - |
-    | %b | 边界字符 |
-    | %l | 左侧完成的进度 |
-    | %r | 右侧未完成的进度 |
-    | %p | 百分数 |
+- **template_styled**
 
-- **boundaryStr**
+    样式化进度条模板，支持的占位符同上。
+
+- **boundaryChar**
 
     边界字符。
 
-- **leftStr**
+- **fillChar**
 
-    完成的进度字符（左侧字符）。
+    已完成部分字符。
 
-- **rightStr**
+- **emptyChar**
 
-    未完成的进度字符（右侧字符）。
+    未完成部分字符。
 
-### **`def __call__(self, value: float) -> Tuple[str, str]`**
+### **`def __call__(self, value: float) -> tuple[str, str]`**
 
 - **value**
 

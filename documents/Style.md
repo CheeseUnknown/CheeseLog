@@ -2,12 +2,6 @@
 
 多种定义好的样式直接使用！
 
-```python
-from cheeselog import logger
-
-logger.debug('hello world', '<green>hello world</green>')
-```
-
 该模版使用`<.+?>`和`</.+?>`包裹内容，实现样式的框定。
 
 你还有更多的选择：
