@@ -52,6 +52,8 @@ from CheeseLog import CheeseLogger
 
 ## **`self.messages: dict[str, CheeseLog.Message]`**
 
+消息类型
+
 ## **`self.messageTemplate: str`**
 
 消息模版
@@ -70,21 +72,35 @@ from CheeseLog import CheeseLogger
 
 ## **`self.is_running: bool`**
 
+是否正在运行
+
 ## **`self.has_console: bool`**
 
 是否有控制台输出
 
 ## **`def addMessage(self, message: CheeseLog.Message)`**
 
+添加消息类型
+
 ## **`def deleteMessage(self, key: str)`**
+
+删除消息类型
 
 ## **`def start(self)`**
 
+启动日志记录
+
 ## **`def stop(self)`**
+
+停止日志记录
 
 ## **`def setFilter(self, filter: CheeseLog.Filter)`**
 
+设置过滤器
+
 ## **`def print(self, content: str, content_styled: str | None = None, messageKey: str = 'DEBUG', *, end: str = '\n', refresh: bool = False)`**
+
+打印日志
 
 - **Args**
 
@@ -110,13 +126,113 @@ from CheeseLog import CheeseLogger
 
 ## **`def debug(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
+打印DEBUG日志
+
+- **Args**
+
+    - **content**
+
+        消息内容
+
+    - **content_styled**
+
+        带样式的消息内容
+
+    - **end**
+
+        结尾符
+
+    - **refresh**
+
+        是否刷新终端输出
+
 ## **`def info(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
+
+打印INFO日志
+
+- **Args**
+
+    - **content**
+
+        消息内容
+
+    - **content_styled**
+
+        带样式的消息内容
+
+    - **end**
+
+        结尾符
+
+    - **refresh**
+
+        是否刷新终端输出
 
 ## **`def warning(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
+打印WARNING日志
+
+- **Args**
+
+    - **content**
+
+        消息内容
+
+    - **content_styled**
+
+        带样式的消息内容
+
+    - **end**
+
+        结尾符
+
+    - **refresh**
+
+        是否刷新终端输出
+
 ## **`def danger(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
 
+打印DANGER日志
+
+- **Args**
+
+    - **content**
+
+        消息内容
+
+    - **content_styled**
+
+        带样式的消息内容
+
+    - **end**
+
+        结尾符
+
+    - **refresh**
+
+        是否刷新终端输出
+
 ## **`def error(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False)`**
+
+打印ERROR日志
+
+- **Args**
+
+    - **content**
+
+        消息内容
+
+    - **content_styled**
+
+        带样式的消息内容
+
+    - **end**
+
+        结尾符
+
+    - **refresh**
+
+        是否刷新终端输出
 
 ## **`def encode(self, content: str) -> str`**
 

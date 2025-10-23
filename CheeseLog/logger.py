@@ -134,8 +134,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
 ```
         '''
 
-        self.key: str = key
-        ''' 标识符 '''
+        self._key: str = key
         self.filePath: str | None = filePath
         ''' 日志文件路径 '''
         self.messages: dict[str, Message] = {
@@ -300,18 +299,68 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
         self._queue.put((message, content, content_styled, messageKey, end, refresh, datetime.datetime.now()))
 
     def debug(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
+        '''
+        打印DEBUG日志
+
+        - Args
+            - content: 消息内容
+            - content_styled: 带样式的消息内容
+            - end: 结尾符
+            - refresh: 是否刷新终端输出
+        '''
+
         self.print(content, content_styled, messageKey = 'DEBUG', end = end, refresh = refresh)
 
     def info(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
+        '''
+        打印INFO日志
+
+        - Args
+            - content: 消息内容
+            - content_styled: 带样式的消息内容
+            - end: 结尾符
+            - refresh: 是否刷新终端输出
+        '''
+
         self.print(content, content_styled, messageKey = 'INFO', end = end, refresh = refresh)
 
     def warning(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
+        '''
+        打印WARNING日志
+
+        - Args
+            - content: 消息内容
+            - content_styled: 带样式的消息内容
+            - end: 结尾符
+            - refresh: 是否刷新终端输出
+        '''
+
         self.print(content, content_styled, messageKey = 'WARNING', end = end, refresh = refresh)
 
     def danger(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
+        '''
+        打印DANGER日志
+
+        - Args
+            - content: 消息内容
+            - content_styled: 带样式的消息内容
+            - end: 结尾符
+            - refresh: 是否刷新终端输出
+        '''
+
         self.print(content, content_styled, messageKey = 'DANGER', end = end, refresh = refresh)
 
     def error(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
+        '''
+        打印ERROR日志
+
+        - Args
+            - content: 消息内容
+            - content_styled: 带样式的消息内容
+            - end: 结尾符
+            - refresh: 是否刷新终端输出
+        '''
+
         self.print(content, content_styled, messageKey = 'ERROR', end = end, refresh = refresh)
 
     def encode(self, content: str) -> str:
@@ -330,3 +379,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
         ''' 是否有控制台输出 '''
 
         return self._has_console
+
+    @property
+    def key(self) -> str:
+        return self._key
