@@ -8,25 +8,25 @@ TAG_PATTERN = re.compile(r'<.+?>')
 TAG_PATTERN_REPL = lambda m: f'\033[{getattr(style, (m.group()[2:] if "/" in m.group() else m.group()[1:])[:-1].upper())[1 if "/" in m.group() else 0]}m'
 
 class CheeseLogger:
-    __slots__ = ('key', 'filePath', 'messages', 'messageTemplate', 'timerTemplate', 'messageTemplate_styled', '_is_running', '_has_console', 'filter', '_queue', '_threadHandler')
+    __slots__ = ('key', 'file_path', 'messages', 'message_template', 'timer_template', 'message_template_styled', '_is_running', '_has_console', 'filter', '_queue', '_thread_handler')
 
     instances: dict[str, CheeseLogger] = {}
     ''' 所有CheeseLogger实例 '''
 
-    def __init__(self, key: str | None = None, filePath: str | None = None, *, messages: dict[str, Message] = {}, messageTemplate: str = '(%k) %t > %c', timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f', messageTemplate_styled: str = '(<black>%k</black>) <black>%t</black> > %c', filter: Filter = {}):
+    def __init__(self, key: str | None = None, file_path: str | None = None, *, messages: dict[str, Message] = {}, message_template: str = '(%k) %t > %c', timer_template: str = '%Y-%m-%d %H:%M:%S.%f', message_template_styled: str = '(<black>%k</black>) <black>%t</black> > %c', filter: Filter = {}):
         '''
         - Static
             - instances: 所有CheeseLogger实例
 
         - Args
-            - filePath: 日志文件路径，若不设置则不会写入文件
+            - file_path: 日志文件路径，若不设置则不会写入文件
             - messages: 消息类型
-            - messageTemplate: 消息模版；支持的占位符有：
+            - message_template: 消息模版；支持的占位符有：
                 - %k: key
                 - %t: 时间模版
                 - %c: 内容
-            - timerTemplate: 时间模版
-            - messageTemplate_styled: 带样式的消息模版；支持的占位符有：
+            - timer_template: 时间模版
+            - message_template_styled: 带样式的消息模版；支持的占位符有：
                 - %k: key
                 - %t: 时间模版
                 - %c: 内容
@@ -78,7 +78,7 @@ class CheeseLogger:
 """ 带有日志文件输出的简易应用 """
 from CheeseLog import CheeseLogger, Message
 
-logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
+logger = CheeseLogger(key = 'myLogger', file_path = 'logs/%Y-%m-%d.log')
 
 logger.debug('This is a debug message.')
 logger.info('This is an info message.')
@@ -86,29 +86,29 @@ logger.warning('This is a warning message.')
 logger.danger('This is a danger message.')
 logger.error('This is an error message.')
 
-logger.addMessage(Message('CUSTOM', 30, messageTemplate_styled = '(<blue>%k</blue>) <black>%t</black> > %c'))
-logger.print('This is a custom message.', messageKey = 'CUSTOM')
+logger.add_message(Message('CUSTOM', 30, message_template_styled = '(<blue>%k</blue>) <black>%t</black> > %c'))
+logger.print('CUSTOM', 'This is a custom message.')
 
 
 """ 简单的消息过滤 """
 from CheeseLog import CheeseLogger, Message
 
 logger = CheeseLogger(key = 'myLogger')
-logger.setFilter({
+logger.set_filter({
     'weight': 20,
-    'messageKeys': [ 'FILTERED' ]
+    'message_keys': [ 'FILTERED' ]
 })
 
-lowWeight_message = Message('LOW_WEIGHT', 10)
-logger.addMessage(lowWeight_message)
-highWeight_message = Message('HIGH_WEIGHT', 50)
-logger.addMessage(highWeight_message)
+low_weight_message = Message('LOW_WEIGHT', 10)
+logger.add_message(low_weight_message)
+high_weight_message = Message('HIGH_WEIGHT', 50)
+logger.add_message(high_weight_message)
 filtered_message = Message('FILTERED', 100)
-logger.addMessage(filtered_message)
+logger.add_message(filtered_message)
 
-logger.print('This is a low weight message.', messageKey = 'LOW_WEIGHT') # 不会输出
-logger.print('This is a high weight message.', messageKey = 'HIGH_WEIGHT')
-logger.print('This is a filtered message.', messageKey = 'FILTERED') # 不会输出
+logger.print('LOW_WEIGHT', 'This is a low weight message.') # 不会输出
+logger.print('HIGH_WEIGHT', 'This is a high weight message.')
+logger.print('FILTERED', 'This is a filtered message.') # 不会输出
 
 
 """ 如何使用进度条实现一个loading效果 """
@@ -116,40 +116,40 @@ import time, random
 
 from CheeseLog import CheeseLogger, Message, ProgressBar
 
-logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
+logger = CheeseLogger(key = 'myLogger', file_path = 'logs/%Y-%m-%d.log')
 
 loadingMessage = Message('LOADING')
-logger.addMessage(loadingMessage)
-loadedMessage = Message('LOADED', 20, messageTemplate_styled = '(<green>%k</green>) <black>%t</black> > %c')
-logger.addMessage(loadedMessage)
+logger.add_message(loadingMessage)
+loadedMessage = Message('LOADED', 20, message_template_styled = '(<green>%k</green>) <black>%t</black> > %c')
+logger.add_message(loadedMessage)
 
-progressbar = ProgressBar()
+progress_bar = ProgressBar()
 i = 0
 while i < 100:
-    bar, bar_styled = progressbar(i / 100)
-    logger.print(bar, bar_styled, messageKey = 'LOADING', refresh = i != 0)
+    bar, bar_styled = progress_bar(i / 100)
+    logger.print('LOADING', bar, bar_styled, refresh = i != 0)
     time.sleep(random.uniform(0.05, 0.15))
     i += random.uniform(0.5, 1)
-logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
+logger.print('LOADED', 'Loading complete!', refresh = True)
 ```
         '''
 
         self._key: str = key
-        self.filePath: str | None = filePath
+        self.file_path: str | None = file_path
         ''' 日志文件路径 '''
         self.messages: dict[str, Message] = {
             'DEBUG': Message('DEBUG', 10),
-            'INFO': Message('INFO', 20, messageTemplate_styled = '(<green>%k</green>) <black>%t</black> > %c'),
-            'WARNING': Message('WARNING', 30, messageTemplate_styled = '(<yellow>%k</yellow>) <black>%t</black> > %c'),
-            'DANGER': Message('DANGER', 40, messageTemplate_styled = '(<red>%k</red>) <black>%t</black> > %c'),
-            'ERROR': Message('ERROR', 50, messageTemplate_styled = '(<magenta>%k</magenta>) <black>%t</black> > %c')
+            'INFO': Message('INFO', 20, message_template_styled = '(<green>%k</green>) <black>%t</black> > %c'),
+            'WARNING': Message('WARNING', 30, message_template_styled = '(<yellow>%k</yellow>) <black>%t</black> > %c'),
+            'DANGER': Message('DANGER', 40, message_template_styled = '(<red>%k</red>) <black>%t</black> > %c'),
+            'ERROR': Message('ERROR', 50, message_template_styled = '(<magenta>%k</magenta>) <black>%t</black> > %c')
         } | messages
         ''' 消息类型 '''
-        self.messageTemplate: str = messageTemplate
+        self.message_template: str = message_template
         ''' 消息模版 '''
-        self.timerTemplate: str = timerTemplate
+        self.timer_template: str = timer_template
         ''' 时间模版 '''
-        self.messageTemplate_styled: str = messageTemplate_styled
+        self.message_template_styled: str = message_template_styled
         ''' 带样式的消息模版 '''
         self.filter: Filter = filter
         ''' 过滤器 '''
@@ -160,27 +160,27 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
         ''' 是否有控制台输出 '''
         self._queue: queue.Queue = queue.Queue()
         ''' 消息队列 '''
-        self._threadHandler: threading.Thread | None = threading.Thread(target = self._threadHandle, daemon = True)
+        self._thread_handler: threading.Thread | None = threading.Thread(target = self._thread_handle, daemon = True)
         ''' 专用线程池 '''
 
         ''' 初始化 '''
         self.filter.setdefault('weight', -1)
-        self.filter.setdefault('messageKeys', set([]))
-        self.filter['messageKeys'] = set(self.filter['messageKeys'])
+        self.filter.setdefault('message_keys', set([]))
+        self.filter['message_keys'] = set(self.filter['message_keys'])
 
-        self._threadHandler.start()
+        self._thread_handler.start()
         atexit.register(self.stop)
 
         if key in CheeseLogger.instances:
             raise KeyError(f'CheeseLogger "{key}" already exists')
         CheeseLogger.instances[key] = self
 
-    def addMessage(self, message: Message):
+    def add_message(self, message: Message):
         ''' 添加消息类型 '''
 
         self.messages[message.key] = message
 
-    def deleteMessage(self, key: str):
+    def delete_message(self, key: str):
         ''' 删除消息类型 '''
 
         if key in self.messages:
@@ -193,8 +193,8 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             return
 
         self._is_running = True
-        self._threadHandler = threading.Thread(target = self._threadHandle, daemon = True)
-        self._threadHandler.start()
+        self._thread_handler = threading.Thread(target = self._thread_handle, daemon = True)
+        self._thread_handler.start()
 
     def stop(self):
         ''' 停止日志记录 '''
@@ -204,26 +204,26 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
 
         self._queue.put(None)
         try:
-            self._threadHandler.join()
+            self._thread_handler.join()
         except KeyboardInterrupt:
             ...
-        self._threadHandler = None
+        self._thread_handler = None
         self._is_running = False
 
-    def setFilter(self, filter: Filter):
+    def set_filter(self, filter: Filter):
         ''' 设置过滤器 '''
 
         self.filter |= filter
-        self.filter['messageKeys'] = set(self.filter['messageKeys'])
+        self.filter['message_keys'] = set(self.filter['message_keys'])
 
-    def _threadHandle(self):
+    def _thread_handle(self):
         while True:
             messages = [self._queue.get()]
             while not self._queue.empty():
                 messages.append(self._queue.get())
 
             _log_content: str = ''
-            lastFilePath: str | None = None
+            last_file_path: str | None = None
             f: io.TextIOWrapper | None = None
 
             for _message in messages:
@@ -237,16 +237,16 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
                 message: Message = _message[0]
                 content = _message[1]
                 content_styled = _message[2]
-                messageKey = _message[3]
+                message_key = _message[3]
                 end = _message[4]
                 refresh = _message[5]
                 now: datetime.datetime = _message[6]
 
-                if messageKey in self.filter['messageKeys'] or message.weight <= self.filter['weight']:
+                if message_key in self.filter['message_keys'] or message.weight <= self.filter['weight']:
                     continue
 
                 if self._has_console:
-                    content_styled = TAG_PATTERN.sub(TAG_PATTERN_REPL, (message.messageTemplate_styled or self.messageTemplate_styled).replace('%t', now.strftime(self.timerTemplate)).replace('%k', messageKey).replace('%c', f'{content_styled or content}'))
+                    content_styled = TAG_PATTERN.sub(TAG_PATTERN_REPL, (message.message_template_styled or self.message_template_styled).replace('%t', now.strftime(self.timer_template)).replace('%k', message_key).replace('%c', f'{content_styled or content}'))
 
                     if refresh:
                         content_styled = f'\033[F\033[K{content_styled}'
@@ -254,30 +254,30 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
                     sys.stdout.write(f'{content_styled.replace("%lt;", "<").replace("%gt;", ">")}{end}')
                     sys.stdout.flush()
 
-                if self.filePath:
+                if self.file_path:
                     try:
-                        filePath = now.strftime(self.filePath)
+                        file_path = now.strftime(self.file_path)
                     except:
-                        filePath = self.filePath
-                    if filePath != lastFilePath:
+                        file_path = self.file_path
+                    if file_path != last_file_path:
                         if f:
                             f.close()
-                        os.makedirs(os.path.dirname(filePath), exist_ok = True)
-                        f = open(filePath, 'a', encoding = 'utf-8')
-                        lastFilePath = filePath
+                        os.makedirs(os.path.dirname(file_path), exist_ok = True)
+                        f = open(file_path, 'a', encoding = 'utf-8')
+                        last_file_path = file_path
 
-                    _log_content += f'{(message.messageTemplate or self.messageTemplate).replace("%t", now.strftime(self.timerTemplate)).replace("%k", messageKey).replace("%c", content).replace("%lt;", "<").replace("%gt;", ">")}\n'
+                    _log_content += f'{(message.message_template or self.message_template).replace("%t", now.strftime(self.timer_template)).replace("%k", message_key).replace("%c", content).replace("%lt;", "<").replace("%gt;", ">")}\n'
                 else:
                     if f:
                         f.close()
                         f = None
-                    lastFilePath = None
+                    last_file_path = None
 
             if f and _log_content:
                 f.write(_log_content)
                 f.flush()
 
-    def print(self, content: str, content_styled: str | None = None, messageKey: str = 'DEBUG', *, end: str = '\n', refresh: bool = False):
+    def print(self, message_key: str, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
         打印日志
 
@@ -292,11 +292,11 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
         if not self._is_running:
             return
 
-        message = self.messages.get(messageKey)
+        message = self.messages.get(message_key)
         if message is None:
-            raise KeyError(f'Message "{messageKey}" does not exist')
+            raise KeyError(f'Message "{message_key}" does not exist')
 
-        self._queue.put((message, content, content_styled, messageKey, end, refresh, datetime.datetime.now()))
+        self._queue.put((message, content, content_styled, message_key, end, refresh, datetime.datetime.now()))
 
     def debug(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
@@ -309,7 +309,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             - refresh: 是否刷新终端输出
         '''
 
-        self.print(content, content_styled, messageKey = 'DEBUG', end = end, refresh = refresh)
+        self.print('DEBUG', content, content_styled, end = end, refresh = refresh)
 
     def info(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
@@ -322,7 +322,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             - refresh: 是否刷新终端输出
         '''
 
-        self.print(content, content_styled, messageKey = 'INFO', end = end, refresh = refresh)
+        self.print('INFO', content, content_styled, end = end, refresh = refresh)
 
     def warning(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
@@ -335,7 +335,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             - refresh: 是否刷新终端输出
         '''
 
-        self.print(content, content_styled, messageKey = 'WARNING', end = end, refresh = refresh)
+        self.print('WARNING', content, content_styled, end = end, refresh = refresh)
 
     def danger(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
@@ -348,7 +348,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             - refresh: 是否刷新终端输出
         '''
 
-        self.print(content, content_styled, messageKey = 'DANGER', end = end, refresh = refresh)
+        self.print('DANGER', content, content_styled, end = end, refresh = refresh)
 
     def error(self, content: str, content_styled: str | None = None, *, end: str = '\n', refresh: bool = False):
         '''
@@ -361,7 +361,7 @@ logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
             - refresh: 是否刷新终端输出
         '''
 
-        self.print(content, content_styled, messageKey = 'ERROR', end = end, refresh = refresh)
+        self.print('ERROR', content, content_styled, end = end, refresh = refresh)
 
     def encode(self, content: str) -> str:
         ''' 当内容中有`'<'`和`'>'`字符时，进行转义 '''

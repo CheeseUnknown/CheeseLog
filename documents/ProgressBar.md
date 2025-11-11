@@ -6,7 +6,7 @@ CheeseLog提供了一个自定义的进度条，配合loading可以达到更好�
 from CheeseLog import ProgressBar
 ```
 
-## **`def __init__(self, length: int = 20, *, template: str = '%b%f%e%b %p%', template_styled: str = '%b%f%e%b <blue>%p</blue>%', boundaryChar: str = '|', fillChar: str = '█', emptyChar: str = '░')`**
+## **`def __init__(self, length: int = 20, *, template: str = '%b%f%e%b %p%', template_styled: str = '%b%f%e%b <blue>%p</blue>%', boundary_char: str = '|', fill_char: str = '█', empty_char: str = '░')`**
 
 - **length**
 
@@ -24,15 +24,15 @@ from CheeseLog import ProgressBar
 
     样式化进度条模板，支持的占位符同上。
 
-- **boundaryChar**
+- **boundary_char**
 
     边界字符。
 
-- **fillChar**
+- **fill_char**
 
     已完成部分字符。
 
-- **emptyChar**
+- **empty_char**
 
     未完成部分字符。
 

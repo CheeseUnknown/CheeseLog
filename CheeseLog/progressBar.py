@@ -1,7 +1,7 @@
 class ProgressBar:
     __slots__ = ('_length', '_template', '_template_styled', '_boundaryChar', '_fillChar', '_emptyChar', '_cached_bar')
 
-    def __init__(self, length: int = 20, *, template: str = '%b%f%e%b %p%', template_styled: str = '%b%f%e%b <blue>%p</blue>%', boundaryChar: str = '|', fillChar: str = '█', emptyChar: str = '░'):
+    def __init__(self, length: int = 20, *, template: str = '%b%f%e%b %p%', template_styled: str = '%b%f%e%b <blue>%p</blue>%', boundary_char: str = '|', fill_char: str = '█', empty_char: str = '░'):
         '''
         进度条
 
@@ -13,9 +13,9 @@ class ProgressBar:
                 - %e: 已完成部分
                 - %p: 百分比
             - template_styled: 样式化进度条模板，支持的占位符同上
-            - boundaryChar: 边界字符
-            - fillChar: 已完成部分字符
-            - emptyChar: 未完成部分字符
+            - boundary_char: 边界字符
+            - fill_char: 已完成部分字符
+            - empty_char: 未完成部分字符
         '''
 
         self._length = length
@@ -24,11 +24,11 @@ class ProgressBar:
         '''  进度条模板 '''
         self._template_styled = template_styled
         '''  样式化进度条模板 '''
-        self._boundaryChar = boundaryChar
+        self._boundaryChar = boundary_char
         '''  边界字符 '''
-        self._fillChar = fillChar
+        self._fillChar = fill_char
         '''  已完成部分字符 '''
-        self._emptyChar = emptyChar
+        self._emptyChar = empty_char
         '''  未完成部分字符 '''
 
         self._cached_bar: list[tuple[str, str]] = []
@@ -43,8 +43,8 @@ class ProgressBar:
         for i in range(self.length + 1):
             empty = self.length - i
             self._cached_bar.append((
-                self.template.replace('%b', self.boundaryChar).replace('%f', self.fillChar * i).replace('%e', self.emptyChar * empty),
-                self.template_styled.replace('%b', self.boundaryChar).replace('%f', self.fillChar * i).replace('%e', self.emptyChar * empty)
+                self.template.replace('%b', self.boundary_char).replace('%f', self.fill_char * i).replace('%e', self.empty_char * empty),
+                self.template_styled.replace('%b', self.boundary_char).replace('%f', self.fill_char * i).replace('%e', self.empty_char * empty)
             ))
 
     def __call__(self, value: float) -> tuple[str, str]:
@@ -96,34 +96,34 @@ class ProgressBar:
         self._cache()
 
     @property
-    def boundaryChar(self) -> str:
+    def boundary_char(self) -> str:
         ''' 边界字符 '''
 
         return self._boundaryChar
 
-    @boundaryChar.setter
-    def boundaryChar(self, value: str):
+    @boundary_char.setter
+    def boundary_char(self, value: str):
         self._boundaryChar = value
         self._cache()
 
     @property
-    def fillChar(self) -> str:
+    def fill_char(self) -> str:
         ''' 已完成部分字符 '''
 
         return self._fillChar
 
-    @fillChar.setter
-    def fillChar(self, value: str):
+    @fill_char.setter
+    def fill_char(self, value: str):
         self._fillChar = value
         self._cache()
 
     @property
-    def emptyChar(self) -> str:
+    def empty_char(self) -> str:
         ''' 未完成部分字符 '''
 
         return self._emptyChar
 
-    @emptyChar.setter
-    def emptyChar(self, value: str):
+    @empty_char.setter
+    def empty_char(self, value: str):
         self._emptyChar = value
         self._cache()

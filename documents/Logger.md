@@ -10,9 +10,9 @@ from CheeseLog import CheeseLogger
 
 所有CheeseLogger实例
 
-## **`def __init__(self, key: str | None = None, filePath: str | None = None, *, messages: dict[str, Message] = {}, messageTemplate: str = '(%k) %t > %c', timerTemplate: str = '%Y-%m-%d %H:%M:%S.%f', messageTemplate_styled: str = '(<black>%k</black>) <black>%t</black> > %c', filter: CheeseLog.Filter = {})`**
+## **`def __init__(self, key: str | None = None, file_path: str | None = None, *, messages: dict[str, Message] = {}, message_template: str = '(%k) %t > %c', timer_template: str = '%Y-%m-%d %H:%M:%S.%f', message_template_styled: str = '(<black>%k</black>) <black>%t</black> > %c', filter: CheeseLog.Filter = {})`**
 
-- **filePath**
+- **file_path**
 
     日志文件路径，若不设置则不会写入文件
 
@@ -20,7 +20,7 @@ from CheeseLog import CheeseLogger
 
     消息类型
 
-- **messageTemplate**
+- **message_template**
 
     消息模版；支持的占位符有：
 
@@ -28,11 +28,11 @@ from CheeseLog import CheeseLogger
     - %t: 时间模版
     - %c: 内容
 
-- **timerTemplate**
+- **timer_template**
 
     时间模版
 
-- **messageTemplate_styled**
+- **message_template_styled**
 
     带样式的消息模版；支持的占位符有：
 
@@ -46,7 +46,7 @@ from CheeseLog import CheeseLogger
 
 ## **`self.key: str`**
 
-## **`self.filePath: str | None`**
+## **`self.file_path: str | None`**
 
     日志文件路径
 
@@ -54,15 +54,15 @@ from CheeseLog import CheeseLogger
 
 消息类型
 
-## **`self.messageTemplate: str`**
+## **`self.message_template: str`**
 
 消息模版
 
-## **`self.timerTemplate: str`**
+## **`self.timer_template: str`**
 
 时间模版
 
-## **`self.messageTemplate_styled: str`**
+## **`self.message_template_styled: str`**
 
 带样式的消息模版
 
@@ -78,11 +78,11 @@ from CheeseLog import CheeseLogger
 
 是否有控制台输出
 
-## **`def addMessage(self, message: CheeseLog.Message)`**
+## **`def add_message(self, message: CheeseLog.Message)`**
 
 添加消息类型
 
-## **`def deleteMessage(self, key: str)`**
+## **`def delete_message(self, key: str)`**
 
 删除消息类型
 
@@ -94,11 +94,11 @@ from CheeseLog import CheeseLogger
 
 停止日志记录
 
-## **`def setFilter(self, filter: CheeseLog.Filter)`**
+## **`def set_filter(self, filter: CheeseLog.Filter)`**
 
 设置过滤器
 
-## **`def print(self, content: str, content_styled: str | None = None, messageKey: str = 'DEBUG', *, end: str = '\n', refresh: bool = False)`**
+## **`def print(self, content: str, content_styled: str | None = None, message_key: str = 'DEBUG', *, end: str = '\n', refresh: bool = False)`**
 
 打印日志
 

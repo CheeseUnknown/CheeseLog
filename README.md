@@ -21,7 +21,7 @@
 ```python
 from CheeseLog import CheeseLogger, Message
 
-logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
+logger = CheeseLogger(key = 'myLogger', file_path = 'logs/%Y-%m-%d.log')
 
 logger.debug('This is a debug message.')
 logger.info('This is an info message.')
@@ -29,8 +29,8 @@ logger.warning('This is a warning message.')
 logger.danger('This is a danger message.')
 logger.error('This is an error message.')
 
-logger.addMessage(Message('CUSTOM', 30, messageTemplate_styled = '(<blue>%k</blue>) <black>%t</black> > %c'))
-logger.print('This is a custom message.', messageKey = 'CUSTOM')
+logger.add_message(Message('CUSTOM', 30, message_template_styled = '(<blue>%k</blue>) <black>%t</black> > %c'))
+logger.print('CUSTOM', 'This is a custom message.')
 ```
 
 ### **简单的消息过滤**
@@ -39,21 +39,21 @@ logger.print('This is a custom message.', messageKey = 'CUSTOM')
 from CheeseLog import CheeseLogger, Message
 
 logger = CheeseLogger(key = 'myLogger')
-logger.setFilter({
+logger.set_filter({
     'weight': 20,
-    'messageKeys': [ 'FILTERED' ]
+    'message_keys': [ 'FILTERED' ]
 })
 
-lowWeight_message = Message('LOW_WEIGHT', 10)
-logger.addMessage(lowWeight_message)
-highWeight_message = Message('HIGH_WEIGHT', 50)
-logger.addMessage(highWeight_message)
+low_weight_message = Message('LOW_WEIGHT', 10)
+logger.add_message(low_weight_message)
+high_weight_message = Message('HIGH_WEIGHT', 50)
+logger.add_message(high_weight_message)
 filtered_message = Message('FILTERED', 100)
-logger.addMessage(filtered_message)
+logger.add_message(filtered_message)
 
-logger.print('This is a low weight message.', messageKey = 'LOW_WEIGHT') # 不会输出
-logger.print('This is a high weight message.', messageKey = 'HIGH_WEIGHT')
-logger.print('This is a filtered message.', messageKey = 'FILTERED') # 不会输出
+logger.print('LOW_WEIGHT', 'This is a low weight message.', message_key = ) # 不会输出
+logger.print('HIGH_WEIGHT', 'This is a high weight message.')
+logger.print('FILTERED', 'This is a filtered message.') # 不会输出
 ```
 
 ### **如何使用进度条实现一个loading效果**
@@ -63,21 +63,21 @@ import time, random
 
 from CheeseLog import CheeseLogger, Message, ProgressBar
 
-logger = CheeseLogger(key = 'myLogger', filePath = 'logs/%Y-%m-%d.log')
+logger = CheeseLogger(key = 'myLogger', file_path = 'logs/%Y-%m-%d.log')
 
 loadingMessage = Message('LOADING')
-logger.addMessage(loadingMessage)
-loadedMessage = Message('LOADED', 20, messageTemplate_styled = '(<green>%k</green>) <black>%t</black> > %c')
-logger.addMessage(loadedMessage)
+logger.add_message(loadingMessage)
+loadedMessage = Message('LOADED', 20, message_template_styled = '(<green>%k</green>) <black>%t</black> > %c')
+logger.add_message(loadedMessage)
 
-progressbar = ProgressBar()
+progress_bar = ProgressBar()
 i = 0
 while i < 100:
-    bar, bar_styled = progressbar(i / 100)
-    logger.print(bar, bar_styled, messageKey = 'LOADING', refresh = i != 0)
+    bar, bar_styled = progress_bar(i / 100)
+    logger.print('LOADING', bar, bar_styled, refresh = i != 0)
     time.sleep(random.uniform(0.05, 0.15))
     i += random.uniform(0.5, 1)
-logger.print('Loading complete!', messageKey = 'LOADED', refresh = True)
+logger.print('LOADED', 'Loading complete!', refresh = True)
 ```
 
 ## **更多...**

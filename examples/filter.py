@@ -2,18 +2,18 @@ import __init__
 from CheeseLog import CheeseLogger, Message
 
 logger = CheeseLogger(key = 'myLogger')
-logger.setFilter({
+logger.set_filter({
     'weight': 20,
-    'messageKeys': [ 'FILTERED' ]
+    'message_keys': [ 'FILTERED' ]
 })
 
-lowWeight_message = Message('LOW_WEIGHT', 10)
-logger.addMessage(lowWeight_message)
-highWeight_message = Message('HIGH_WEIGHT', 50)
-logger.addMessage(highWeight_message)
+low_weight_message = Message('LOW_WEIGHT', 10)
+logger.add_message(low_weight_message)
+high_weight_message = Message('HIGH_WEIGHT', 50)
+logger.add_message(high_weight_message)
 filtered_message = Message('FILTERED', 100)
-logger.addMessage(filtered_message)
+logger.add_message(filtered_message)
 
-logger.print('This is a low weight message.', messageKey = 'LOW_WEIGHT') # 不会输出
-logger.print('This is a high weight message.', messageKey = 'HIGH_WEIGHT')
-logger.print('This is a filtered message.', messageKey = 'FILTERED') # 不会输出
+logger.print('LOW_WEIGHT', 'This is a low weight message.') # 不会输出
+logger.print('HIGH_WEIGHT', 'This is a high weight message.')
+logger.print('FILTERED', 'This is a filtered message.') # 不会输出
