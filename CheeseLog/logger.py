@@ -8,7 +8,7 @@ TAG_PATTERN = re.compile(r'<.+?>')
 TAG_PATTERN_REPL = lambda m: f'\033[{getattr(style, (m.group()[2:] if "/" in m.group() else m.group()[1:])[:-1].upper())[1 if "/" in m.group() else 0]}m'
 
 class CheeseLogger:
-    __slots__ = ('key', 'file_path', 'messages', 'message_template', 'timer_template', 'message_template_styled', '_is_running', '_has_console', 'filter', '_queue', '_thread_handler')
+    __slots__ = ('_key', 'file_path', 'messages', 'message_template', 'timer_template', 'message_template_styled', '_is_running', '_has_console', 'filter', '_queue', '_thread_handler')
 
     instances: dict[str, CheeseLogger] = {}
     ''' 所有CheeseLogger实例 '''
