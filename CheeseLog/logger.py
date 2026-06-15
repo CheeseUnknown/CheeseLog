@@ -264,6 +264,10 @@ class CheeseLogger:
         if not self._is_running:
             return
 
+        if self._thread_handler and not self._thread_handler.is_alive():
+            self._thread_handler = threading.Thread(target = self._thread_handle, daemon = True)
+            self._thread_handler.start()
+
         message = self.messages.get(message_key)
         if message is None:
             raise KeyError(f'Message "{message_key}" does not exist')
